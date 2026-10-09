@@ -22,14 +22,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className={`${saira.variable} font-sans`}>
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-          crossOrigin=""
-        />
-      </head>
       <body className="min-h-screen bg-[#F4F6FB] text-slate-900 font-sans antialiased selection:bg-blue-600 selection:text-white overflow-x-hidden">
         <AppLayoutWrapper>{children}</AppLayoutWrapper>
       </body>

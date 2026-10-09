@@ -8,55 +8,61 @@ import { ensureDatabaseReady } from "@/db/bootstrap";
 
 export async function getDashboardData() {
   await ensureDatabaseReady();
-  const marcasList = await db.select().from(marcas);
-  const campanhasList = await db.query.campanhas.findMany({
-    with: {
-      marca: true,
-      midias: {
-        with: {
-          fornecedor: true,
-          pontoFisico: true,
-        },
-      },
-    },
-    orderBy: [desc(campanhas.dataFim)],
-  });
-
-  const fornecedoresList = await db.select().from(fornecedores);
   
-  const midiasList = await db.query.midiasCampanha.findMany({
-    with: {
-      campanha: true,
-      fornecedor: true,
-      pontoFisico: true,
-      marca: true,
-    },
-    orderBy: [desc(midiasCampanha.dataFim)],
-  });
-
-  const pontosList = await db.query.pontosFisicos.findMany({
-    with: {
-      fornecedor: true,
-      midias: {
-        with: {
-          campanha: true,
+  const [
+    marcasList,
+    campanhasList,
+    fornecedoresList,
+    midiasList,
+    pontosList,
+    checkingsList,
+  ] = await Promise.all([
+    db.select().from(marcas),
+    db.query.campanhas.findMany({
+      with: {
+        marca: true,
+        midias: {
+          with: {
+            fornecedor: true,
+            pontoFisico: true,
+          },
         },
       },
-    },
-  });
-
-  const checkingsList = await db.query.checkings.findMany({
-    with: {
-      midiaCampanha: {
-        with: {
-          marca: true,
-          campanha: true,
+      orderBy: [desc(campanhas.dataFim)],
+    }),
+    db.select().from(fornecedores),
+    db.query.midiasCampanha.findMany({
+      with: {
+        campanha: true,
+        fornecedor: true,
+        pontoFisico: true,
+        marca: true,
+      },
+      orderBy: [desc(midiasCampanha.dataFim)],
+    }),
+    db.query.pontosFisicos.findMany({
+      with: {
+        fornecedor: true,
+        midias: {
+          with: {
+            campanha: true,
+          },
         },
       },
-      pontoFisico: true,
-    },
-    orderBy: [desc(checkings.dataChecagem)],
-  });
+    }),
+    db.query.checkings.findMany({
+      with: {
+        midiaCampanha: {
+          with: {
+            marca: true,
+            campanha: true,
+          },
+        },
+        pontoFisico: true,
+      },
+      orderBy: [desc(checkings.dataChecagem)],
+    }),
+  ]);
 
   return {
     marcas: marcasList,
@@ -103,19 +109,20 @@ export async function getCampanhaPorId(id: string) {
 
 export async function getPontosParaMapa() {
   await ensureDatabaseReady();
-  const pontos = await db.query.pontosFisicos.findMany({
-    with: {
-      fornecedor: true,
-      midias: {
-        with: {
-          campanha: true,
+  const [pontos, fornecedoresList, campanhasList] = await Promise.all([
+    db.query.pontosFisicos.findMany({
+      with: {
+        fornecedor: true,
+        midias: {
+          with: {
+            campanha: true,
+          },
         },
       },
-    },
-  });
-
-  const fornecedoresList = await db.select().from(fornecedores);
-  const campanhasList = await db.select().from(campanhas);
+    }),
+    db.select().from(fornecedores),
+    db.select().from(campanhas),
+  ]);
 
   return {
     pontos,
@@ -126,47 +133,47 @@ export async function getPontosParaMapa() {
 
 export async function getCentralTerritorialData() {
   await ensureDatabaseReady();
-  const pontos = await db.query.pontosFisicos.findMany({
-    with: {
-      fornecedor: true,
-      midias: {
-        with: {
-          campanha: true,
-          marca: true,
+  const [pontos, checkingsList, fornecedoresList, campanhasList] = await Promise.all([
+    db.query.pontosFisicos.findMany({
+      with: {
+        fornecedor: true,
+        midias: {
+          with: {
+            campanha: true,
+            marca: true,
+          },
         },
-      },
-      checkings: {
-        with: {
-          midiaCampanha: {
-            with: {
-              campanha: true,
-              marca: true,
+        checkings: {
+          with: {
+            midiaCampanha: {
+              with: {
+                campanha: true,
+                marca: true,
+              },
             },
           },
         },
       },
-    },
-  });
-
-  const checkingsList = await db.query.checkings.findMany({
-    with: {
-      pontoFisico: {
-        with: {
-          fornecedor: true,
+    }),
+    db.query.checkings.findMany({
+      with: {
+        pontoFisico: {
+          with: {
+            fornecedor: true,
+          },
+        },
+        midiaCampanha: {
+          with: {
+            campanha: true,
+            marca: true,
+          },
         },
       },
-      midiaCampanha: {
-        with: {
-          campanha: true,
-          marca: true,
-        },
-      },
-    },
-    orderBy: [desc(checkings.dataChecagem)],
-  });
-
-  const fornecedoresList = await db.select().from(fornecedores);
-  const campanhasList = await db.select().from(campanhas);
+      orderBy: [desc(checkings.dataChecagem)],
+    }),
+    db.select().from(fornecedores),
+    db.select().from(campanhas),
+  ]);
 
   return {
     pontos,

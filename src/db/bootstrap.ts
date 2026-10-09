@@ -12,6 +12,18 @@ export async function ensureDatabaseReady() {
   isBootstrapping = true;
 
   try {
+    // Verificação rápida: se a tabela marcas já existir e tiver dados, encerra imediatamente (0ms de overhead)
+    try {
+      const checagem = await client.execute("SELECT id FROM marcas LIMIT 1;");
+      if (checagem.rows && checagem.rows.length > 0) {
+        isBootstrapped = true;
+        isBootstrapping = false;
+        return;
+      }
+    } catch {
+      // Tabela não existe ainda, prosseguir para a criação
+    }
+
     // 1. Criar tabelas se não existirem
     await client.execute(`
       CREATE TABLE IF NOT EXISTS marcas (
