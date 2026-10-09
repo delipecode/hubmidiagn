@@ -4,8 +4,10 @@ import { db } from "@/db";
 import { marcas, campanhas, fornecedores, pontosFisicos, midiasCampanha, checkings } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { ensureDatabaseReady } from "@/db/bootstrap";
 
 export async function getDashboardData() {
+  await ensureDatabaseReady();
   const marcasList = await db.select().from(marcas);
   const campanhasList = await db.query.campanhas.findMany({
     with: {
@@ -67,6 +69,7 @@ export async function getDashboardData() {
 }
 
 export async function getCampanhasCompletas() {
+  await ensureDatabaseReady();
   return await db.query.campanhas.findMany({
     with: {
       marca: true,
@@ -82,6 +85,7 @@ export async function getCampanhasCompletas() {
 }
 
 export async function getCampanhaPorId(id: string) {
+  await ensureDatabaseReady();
   return await db.query.campanhas.findFirst({
     where: eq(campanhas.id, id),
     with: {
@@ -98,6 +102,7 @@ export async function getCampanhaPorId(id: string) {
 }
 
 export async function getPontosParaMapa() {
+  await ensureDatabaseReady();
   const pontos = await db.query.pontosFisicos.findMany({
     with: {
       fornecedor: true,
@@ -120,6 +125,7 @@ export async function getPontosParaMapa() {
 }
 
 export async function getCentralTerritorialData() {
+  await ensureDatabaseReady();
   const pontos = await db.query.pontosFisicos.findMany({
     with: {
       fornecedor: true,

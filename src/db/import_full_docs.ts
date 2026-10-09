@@ -3,10 +3,17 @@ import path from "path";
 import { db } from "./index";
 import { marcas, campanhas, fornecedores, pontosFisicos, midiasCampanha, checkings } from "./schema";
 
-const baseDir = "E:\\Antigravity Google";
-const allDirs = fs.readdirSync(baseDir);
-const docsDirName = allDirs.find((d) => d.toLowerCase().includes("docs") && d.toLowerCase().includes("dia")) || "DOCS MÍDIA";
-const docsDir = path.join(baseDir, docsDirName);
+let docsDir = "";
+try {
+  const baseDir = "E:\\Antigravity Google";
+  if (fs.existsSync(baseDir)) {
+    const allDirs = fs.readdirSync(baseDir);
+    const docsDirName = allDirs.find((d) => d.toLowerCase().includes("docs") && d.toLowerCase().includes("dia")) || "DOCS MÍDIA";
+    docsDir = path.join(baseDir, docsDirName);
+  }
+} catch {
+  docsDir = "";
+}
 
 // Mapeamento de coordenadas de referência para bairros de Feira de Santana, Serrinha e Irecê
 const geoBairros: Record<string, { lat: number; lng: number }> = {
