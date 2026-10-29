@@ -148,7 +148,7 @@ export function Sidebar() {
           {/* BRANDING EXECUTIVO */}
           <Link href="/" className="flex items-center gap-3.5 group">
             <div className="relative w-11 h-11 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/25 group-hover:scale-105 transition-all text-white">
-              <Radio className="w-5 h-5 animate-pulse" />
+              <Radio className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -160,7 +160,7 @@ export function Sidebar() {
                 </span>
               </div>
               <p className="text-xs text-slate-600 font-semibold">
-                Holding Grupo Nobre
+                Grupo Nobre
               </p>
             </div>
           </Link>

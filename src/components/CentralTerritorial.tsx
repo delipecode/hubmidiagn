@@ -318,7 +318,7 @@ export function CentralTerritorial({
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-slate-300">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2 text-xs font-extrabold text-blue-700 uppercase tracking-wider">
-            <Compass className="w-4 h-4 text-blue-700 animate-spin" style={{ animationDuration: "14s" }} />
+            <Compass className="w-4 h-4 text-blue-700" />
             <span>Mapa de Mídia • Grupo Nobre</span>
           </div>
           <h1 className="font-display text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">

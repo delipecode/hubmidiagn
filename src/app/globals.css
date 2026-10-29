@@ -22,7 +22,7 @@
   --color-surface-hover: #F8FAFC;
   --color-surface-border: #E2E8F0;
 
-  /* Caixas de Cores Sólidas da Holding */
+  /* Caixas de Cores Sólidas do Grupo Nobre */
   --color-unef: #F59E13;
   --color-unifan: #2563EB;
   --color-nobre: #0284C7;
@@ -44,10 +44,6 @@ body {
   color: #0F172A;
   font-family: var(--font-sans);
   letter-spacing: -0.01em;
-  background-image: 
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(37, 99, 235, 0.06), transparent 70%),
-    radial-gradient(ellipse 50% 40% at 90% 10%, rgba(2, 132, 199, 0.04), transparent 50%);
-  background-attachment: fixed;
 }
 
 /* Tipografia Saira para tudo */
@@ -63,7 +59,7 @@ h1, h2, h3, h4, h5, h6, .font-display {
   border: 1px solid #E2E8F0;
   border-radius: 1.25rem;
   box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 
 .executive-card-hover:hover {

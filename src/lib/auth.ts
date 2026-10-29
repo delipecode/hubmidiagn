@@ -3,21 +3,14 @@
 import { cookies } from "next/headers";
 
 const SESSION_COOKIE_NAME = "gn_session";
-const SESSION_SECRET = process.env.AUTH_SECRET || "grupo-nobre-midia-secret-key-2026";
 
 // Credenciais padrão (podem ser customizadas via .env)
 const VALID_ACCOUNTS = [
   {
-    email: process.env.ADMIN_EMAIL || "marketing@gruponobre.edu.br",
-    password: process.env.ADMIN_PASSWORD || "nobre2026",
-    name: "Marketing Executivo",
-    cargo: "Diretoria de Mídia & Inteligência",
-  },
-  {
-    email: "diretoria@gruponobre.edu.br",
-    password: process.env.DIRETORIA_PASSWORD || "diretoria2026",
-    name: "Diretoria Grupo Nobre",
-    cargo: "Acesso Geral Holding",
+    email: process.env.ADMIN_USER || "admin",
+    password: process.env.ADMIN_PASSWORD || "1234",
+    name: "Administrador",
+    cargo: "Gestão de Mídia • Grupo Nobre",
   },
 ];
 
@@ -47,7 +40,7 @@ export async function loginAction(formData: FormData) {
   const password = formData.get("password")?.toString();
 
   if (!email || !password) {
-    return { success: false, error: "Preencha o e-mail institucional e a senha." };
+    return { success: false, error: "Preencha o usuário e a senha." };
   }
 
   const account = VALID_ACCOUNTS.find(
@@ -55,7 +48,7 @@ export async function loginAction(formData: FormData) {
   );
 
   if (!account) {
-    return { success: false, error: "Credenciais inválidas. Verifique seu e-mail e senha." };
+    return { success: false, error: "Credenciais inválidas. Verifique seu usuário e senha." };
   }
 
   const token = await createSessionToken(account.email);
@@ -91,7 +84,7 @@ export async function getSession() {
 
   return {
     email: verified.email,
-    name: account?.name || "Usuário Autorizado",
-    cargo: account?.cargo || "Holding Grupo Nobre",
+    name: account?.name || "Administrador",
+    cargo: account?.cargo || "Grupo Nobre",
   };
 }

@@ -1,6 +1,6 @@
 # 📍 Hub Mídia GN — Central Executiva de Mídia, Presença & OOH
 
-Plataforma de gestão de presença territorial, canais e veiculações de mídia para a holding **Grupo Nobre** (*UNEF, UNIFAN, Colégio Nobre e Maple Bear*).
+Plataforma de gestão de presença territorial, canais e veiculações de mídia para o **Grupo Nobre** (*UNEF, UNIFAN, Colégio Nobre e Maple Bear*).
 
 ---
 

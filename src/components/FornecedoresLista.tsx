@@ -560,7 +560,7 @@ export function FornecedoresLista({ fornecedores }: FornecedoresListaProps) {
                       Nenhum contrato ativo no momento
                     </div>
                     <p className="text-xs text-slate-600">
-                      Este parceiro está homologado no catálogo geral e disponível para novas contratações da holding.
+                      Este parceiro está homologado no catálogo geral e disponível para novas contratações do Grupo Nobre.
                     </p>
                   </div>
                 )}

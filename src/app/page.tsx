@@ -51,7 +51,7 @@ export default async function DashboardPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-slate-200">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase tracking-wider">
-            <Compass className="w-4 h-4 text-blue-600 animate-spin" style={{ animationDuration: "12s" }} />
+            <Compass className="w-4 h-4 text-blue-600" />
             <span>Gestão de Mídia • Grupo Nobre</span>
           </div>
           <h1 className="font-display text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
@@ -75,7 +75,7 @@ export default async function DashboardPage() {
             className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all"
           >
             <MapPin className="w-4 h-4 text-white" />
-            <span>Central Territorial & OOH</span>
+            <span>Mapa de Mídia</span>
           </Link>
         </div>
       </div>
