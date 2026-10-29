@@ -184,6 +184,7 @@ export async function getCentralTerritorialData() {
 }
 
 export async function getFornecedoresComMidias() {
+  await ensureDatabaseReady();
   return await db.query.fornecedores.findMany({
     with: {
       midias: {
@@ -488,7 +489,128 @@ export async function criarPontoFisicoComMidia(formData: {
   revalidatePath("/mapa");
   revalidatePath("/pontos");
   revalidatePath("/campanhas");
+  revalidatePath("/fornecedores");
   revalidatePath("/");
 
   return { success: true, id: pontoId };
+}
+
+export async function editarFornecedor(
+  id: string,
+  formData: {
+    nome: string;
+    categoriaGeral: "OFFLINE" | "DIGITAL";
+    tipoVeiculo: string;
+    praca?: string;
+    contatoNome?: string;
+    whatsapp?: string;
+    email?: string;
+    prazoEntregaDias?: number;
+    specsTecnicas?: string;
+    observacoes?: string;
+  }
+) {
+  await db
+    .update(fornecedores)
+    .set({
+      nome: formData.nome,
+      categoriaGeral: formData.categoriaGeral || "OFFLINE",
+      tipoVeiculo: formData.tipoVeiculo,
+      praca: formData.praca || "Feira de Santana",
+      contatoNome: formData.contatoNome || null,
+      whatsapp: formData.whatsapp ? formData.whatsapp.replace(/\D/g, "") : null,
+      email: formData.email || null,
+      prazoEntregaDias: formData.prazoEntregaDias || 2,
+      specsTecnicas: formData.specsTecnicas || null,
+      observacoes: formData.observacoes || null,
+    })
+    .where(eq(fornecedores.id, id));
+
+  revalidatePath("/fornecedores");
+  revalidatePath("/pontos");
+  revalidatePath("/campanhas");
+  revalidatePath("/");
+
+  return { success: true };
+}
+
+export async function excluirFornecedor(id: string) {
+  const pontos = await db
+    .select({ id: pontosFisicos.id })
+    .from(pontosFisicos)
+    .where(eq(pontosFisicos.fornecedorId, id));
+
+  for (const p of pontos) {
+    await db.delete(checkings).where(eq(checkings.pontoFisicoId, p.id));
+    await db.delete(midiasCampanha).where(eq(midiasCampanha.pontoFisicoId, p.id));
+  }
+
+  await db.delete(midiasCampanha).where(eq(midiasCampanha.fornecedorId, id));
+  await db.delete(pontosFisicos).where(eq(pontosFisicos.fornecedorId, id));
+  await db.delete(fornecedores).where(eq(fornecedores.id, id));
+
+  revalidatePath("/fornecedores");
+  revalidatePath("/pontos");
+  revalidatePath("/campanhas");
+  revalidatePath("/");
+
+  return { success: true };
+}
+
+export async function editarPontoFisico(
+  id: string,
+  formData: {
+    fornecedorId?: string;
+    codigoIdentificador?: string;
+    nomeLocal: string;
+    tipoFormato: string;
+    praca?: string;
+    bairro: string;
+    endereco?: string;
+    latitude: number;
+    longitude: number;
+    fotoLocalUrl?: string | null;
+    statusPonto?: string;
+    observacoes?: string | null;
+  }
+) {
+  await db
+    .update(pontosFisicos)
+    .set({
+      ...(formData.fornecedorId ? { fornecedorId: formData.fornecedorId } : {}),
+      codigoIdentificador: formData.codigoIdentificador || null,
+      nomeLocal: formData.nomeLocal,
+      tipoFormato: formData.tipoFormato,
+      praca: formData.praca || "Feira de Santana",
+      bairro: formData.bairro,
+      endereco: formData.endereco || null,
+      latitude: formData.latitude,
+      longitude: formData.longitude,
+      fotoLocalUrl: formData.fotoLocalUrl !== undefined ? formData.fotoLocalUrl : null,
+      ...(formData.statusPonto ? { statusPonto: formData.statusPonto } : {}),
+      observacoes: formData.observacoes !== undefined ? formData.observacoes : null,
+    })
+    .where(eq(pontosFisicos.id, id));
+
+  revalidatePath("/fornecedores");
+  revalidatePath("/pontos");
+  revalidatePath("/mapa");
+  revalidatePath("/campanhas");
+  revalidatePath("/");
+
+  return { success: true };
+}
+
+export async function excluirPontoFisico(id: string) {
+  await db.delete(checkings).where(eq(checkings.pontoFisicoId, id));
+  await db.delete(midiasCampanha).where(eq(midiasCampanha.pontoFisicoId, id));
+  await db.delete(pontosFisicos).where(eq(pontosFisicos.id, id));
+
+  revalidatePath("/fornecedores");
+  revalidatePath("/pontos");
+  revalidatePath("/mapa");
+  revalidatePath("/campanhas");
+  revalidatePath("/");
+
+  return { success: true };
 }

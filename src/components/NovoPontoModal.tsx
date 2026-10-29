@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { criarPontoFisicoComMidia } from "@/lib/actions";
 import {
   Plus,
@@ -11,24 +11,60 @@ import {
   Calendar,
   Image as ImageIcon,
   CheckCircle2,
+  Upload,
 } from "lucide-react";
+
+function comprimirImagemNovoPonto(file: File, maxWidth = 900, quality = 0.78): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return reject(new Error("Erro no canvas"));
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = reject;
+      img.src = ev.target?.result as string;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 interface NovoPontoModalProps {
   fornecedores: any[];
   campanhas: any[];
+  fornecedorPadraoId?: string;
+  labelBotao?: string;
   onSucesso?: () => void;
 }
 
 export function NovoPontoModal({
   fornecedores,
   campanhas,
+  fornecedorPadraoId,
+  labelBotao,
   onSucesso,
 }: NovoPontoModalProps) {
   const [aberto, setAberto] = useState(false);
   const [salvando, setSalvando] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Estados do Formulário
-  const [fornecedorId, setFornecedorId] = useState(fornecedores[0]?.id || "");
+  const [fornecedorId, setFornecedorId] = useState(
+    fornecedorPadraoId || fornecedores[0]?.id || ""
+  );
   const [codigoIdentificador, setCodigoIdentificador] = useState("");
   const [nomeLocal, setNomeLocal] = useState("");
   const [tipoFormato, setTipoFormato] = useState("Outdoor Lona 9x3m");
@@ -112,11 +148,14 @@ export function NovoPontoModal({
   return (
     <>
       <button
-        onClick={() => setAberto(true)}
-        className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all"
+        onClick={() => {
+          if (fornecedorPadraoId) setFornecedorId(fornecedorPadraoId);
+          setAberto(true);
+        }}
+        className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all cursor-pointer"
       >
         <Plus className="w-4 h-4" />
-        <span>Novo Ponto (Outdoor / LED / Academia)</span>
+        <span>{labelBotao || "Novo Ponto (Outdoor / LED / Academia)"}</span>
       </button>
 
       {/* MODAL */}
@@ -286,16 +325,60 @@ export function NovoPontoModal({
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-slate-700 font-semibold mb-1">
-                    Link da Foto do Ponto / Fachada (URL):
-                  </label>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-slate-700 font-semibold">
+                      Foto do Ponto / Outdoor / Mídia:
+                    </label>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        try {
+                          const dataUrl = await comprimirImagemNovoPonto(file);
+                          setFotoLocalUrl(dataUrl);
+                        } catch {
+                          alert("Erro ao processar imagem.");
+                        }
+                      }}
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="px-3 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-[11px] flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Upload className="w-3.5 h-3.5" /> Enviar Foto do Dispositivo
+                    </button>
+                  </div>
+
+                  {fotoLocalUrl && (
+                    <div className="relative h-28 w-full rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
+                      <img src={fotoLocalUrl} alt="Preview" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setFotoLocalUrl("")}
+                        className="absolute top-2 right-2 px-2 py-1 rounded-md bg-slate-900/80 text-white text-[10px] font-bold"
+                      >
+                        Remover
+                      </button>
+                    </div>
+                  )}
+
                   <input
-                    type="url"
-                    value={fotoLocalUrl}
+                    type="text"
+                    value={fotoLocalUrl.startsWith("data:") ? "" : fotoLocalUrl}
                     onChange={(e) => setFotoLocalUrl(e.target.value)}
-                    placeholder="https://... (Foto do outdoor ou academia)"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
+                    disabled={fotoLocalUrl.startsWith("data:")}
+                    placeholder={
+                      fotoLocalUrl.startsWith("data:")
+                        ? "Foto carregada do dispositivo"
+                        : "Ou cole o link https://... da foto do outdoor/mídia"
+                    }
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-blue-500 focus:bg-white disabled:bg-slate-100"
                   />
                 </div>
               </div>

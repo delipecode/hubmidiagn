@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { BrandBadge, StatusBadge, CountdownBadge, MediaCategoryBadge } from "@/components/BrandBadge";
 import { formatarData } from "@/lib/utils";
 import { NovoPontoModal } from "@/components/NovoPontoModal";
+import { EditarPontoModal } from "@/components/EditarPontoModal";
 import {
   MapPin,
   List,
@@ -21,6 +23,7 @@ import {
   Compass,
   ArrowRight,
   Filter,
+  Edit3,
 } from "lucide-react";
 
 interface CentralTerritorialProps {
@@ -36,12 +39,14 @@ export function CentralTerritorial({
   fornecedores,
   campanhas,
 }: CentralTerritorialProps) {
+  const router = useRouter();
   const [modoVisualizacao, setModoVisualizacao] = useState<"mapa" | "inventario" | "checking">("mapa");
   const [filtroMarca, setFiltroMarca] = useState("TODAS");
   const [filtroStatus, setFiltroStatus] = useState("TODOS");
   const [filtroTipoMidia, setFiltroTipoMidia] = useState("TODOS");
   const [busca, setBusca] = useState("");
   const [pontoAtivoId, setPontoAtivoId] = useState<string | null>(null);
+  const [pontoEditando, setPontoEditando] = useState<any | null>(null);
   const [estiloMapa, setEstiloMapa] = useState<"claro" | "satelite" | "dark">("claro");
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -593,20 +598,33 @@ export function CentralTerritorial({
                     </div>
                   )}
 
-                  <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-xs">
-                    <span className="text-xs text-slate-800 truncate max-w-[140px] font-bold">
+                  <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-xs gap-1.5">
+                    <span className="text-xs text-slate-800 truncate max-w-[110px] font-bold">
                       {ponto.fornecedor?.nome}
                     </span>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        focarPontoNoMapa(ponto);
-                      }}
-                      className="text-xs font-extrabold flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-xl shadow-sm transition-all"
-                    >
-                      <span>Focar no Mapa</span> <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPontoEditando(ponto);
+                        }}
+                        className="text-xs font-bold flex items-center gap-1 bg-slate-100 hover:bg-blue-50 text-slate-800 hover:text-blue-700 border border-slate-300 px-2.5 py-1.5 rounded-xl transition-all cursor-pointer"
+                      >
+                        <Camera className="w-3.5 h-3.5 text-blue-600" />
+                        <span>Foto / Editar</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          focarPontoNoMapa(ponto);
+                        }}
+                        className="text-xs font-extrabold flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1.5 rounded-xl shadow-sm transition-all cursor-pointer"
+                      >
+                        <span>Focar</span> <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
@@ -628,14 +646,27 @@ export function CentralTerritorial({
                 className="bg-white border-2 border-slate-300 rounded-3xl p-6 space-y-4 flex flex-col justify-between relative overflow-hidden shadow-sm hover:shadow-md transition-shadow"
               >
                 <div>
-                  {ponto.fotoLocalUrl && (
-                    <div className="h-44 -mx-6 -mt-6 mb-4 overflow-hidden relative border-b-2 border-slate-300 bg-slate-100">
+                  <div className="h-44 -mx-6 -mt-6 mb-4 overflow-hidden relative border-b-2 border-slate-300 bg-slate-100">
+                    {ponto.fotoLocalUrl ? (
                       <img src={ponto.fotoLocalUrl} alt="" className="w-full h-full object-cover" />
-                      <div className="absolute top-3 left-3">
-                        <StatusBadge status={ponto.statusPonto} />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 text-xs font-bold gap-1">
+                        <Camera className="w-6 h-6" />
+                        <span>Sem foto cadastrada</span>
                       </div>
+                    )}
+                    <div className="absolute top-3 left-3">
+                      <StatusBadge status={ponto.statusPonto} />
                     </div>
-                  )}
+                    <button
+                      type="button"
+                      onClick={() => setPontoEditando(ponto)}
+                      className="absolute bottom-3 right-3 px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-blue-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-md transition-all cursor-pointer"
+                    >
+                      <Camera className="w-3.5 h-3.5 text-sky-300" />
+                      <span>Trocar Foto / Editar</span>
+                    </button>
+                  </div>
 
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs text-slate-600 font-bold">
@@ -763,6 +794,17 @@ export function CentralTerritorial({
           ))}
         </div>
       )}
+
+      {/* MODAL EDITAR PONTO / TROCAR FOTO */}
+      <EditarPontoModal
+        ponto={pontoEditando}
+        fornecedores={fornecedores}
+        aberto={Boolean(pontoEditando)}
+        onClose={() => setPontoEditando(null)}
+        onSucesso={() => {
+          router.refresh();
+        }}
+      />
 
     </div>
   );
