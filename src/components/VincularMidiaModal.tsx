@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { adicionarMidiaCampanha } from "@/lib/actions";
 import { Plus, X, Layers, Building2, Calendar, CheckCircle2 } from "lucide-react";
 
@@ -21,6 +22,7 @@ export function VincularMidiaModal({
   fornecedores = [],
   onSucesso,
 }: VincularMidiaModalProps) {
+  const router = useRouter();
   const [aberto, setAberto] = useState(false);
   const [salvando, setSalvando] = useState(false);
 
@@ -74,6 +76,7 @@ export function VincularMidiaModal({
       });
 
       setAberto(false);
+      router.refresh();
       if (onSucesso) onSucesso();
     } catch (err) {
       console.error("Erro ao vincular mídia:", err);

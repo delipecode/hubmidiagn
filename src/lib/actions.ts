@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { marcas, campanhas, fornecedores, pontosFisicos, midiasCampanha, checkings } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { ensureDatabaseReady } from "@/db/bootstrap";
 
@@ -262,7 +262,14 @@ export async function editarCampanha(
     })
     .where(eq(campanhas.id, id));
 
+  // Atualizar marcaId em todas as mídias da campanha
+  await db
+    .update(midiasCampanha)
+    .set({ marcaId: formData.marcaId })
+    .where(eq(midiasCampanha.campanhaId, id));
+
   revalidatePath("/campanhas");
+  revalidatePath(`/campanhas/${id}`);
   revalidatePath("/pontos");
   revalidatePath("/mapa");
   revalidatePath("/");
@@ -349,6 +356,101 @@ export async function adicionarMidiaCampanha(formData: {
   revalidatePath("/");
 
   return { success: true, id };
+}
+
+export async function editarMidiaCampanha(
+  id: string,
+  formData: {
+    fornecedorId?: string;
+    pontoFisicoId?: string | null;
+    categoriaMidia?: string;
+    subtipoMidia?: string;
+    formatoPeca?: string;
+    biSemana?: string | null;
+    dataInicio?: string;
+    dataFim?: string;
+    statusVeiculacao?: string;
+    tipoAcaoFinal?: string | null;
+    valorNegociado?: number | null;
+    numPI?: string | null;
+    observacoes?: string | null;
+    fotoLocalUrl?: string | null;
+  }
+) {
+  const midiaAtual = await db.query.midiasCampanha.findFirst({
+    where: eq(midiasCampanha.id, id),
+  });
+
+  if (!midiaAtual) {
+    throw new Error("Mídia não encontrada.");
+  }
+
+  // Se o ponto físico mudou
+  const pontoMudou = formData.pontoFisicoId !== undefined && formData.pontoFisicoId !== midiaAtual.pontoFisicoId;
+
+  if (pontoMudou && midiaAtual.pontoFisicoId) {
+    // Verificar se outras mídias usam o ponto antigo
+    const outras = await db
+      .select({ id: midiasCampanha.id })
+      .from(midiasCampanha)
+      .where(
+        and(
+          eq(midiasCampanha.pontoFisicoId, midiaAtual.pontoFisicoId),
+          ne(midiasCampanha.id, id)
+        )
+      );
+    if (outras.length === 0) {
+      await db
+        .update(pontosFisicos)
+        .set({ statusPonto: "Disponível / Mapeado" })
+        .where(eq(pontosFisicos.id, midiaAtual.pontoFisicoId));
+    }
+  }
+
+  const novoPontoId = formData.pontoFisicoId !== undefined ? formData.pontoFisicoId : midiaAtual.pontoFisicoId;
+
+  if (pontoMudou && novoPontoId) {
+    await db
+      .update(pontosFisicos)
+      .set({ statusPonto: "Comprado / Ativo" })
+      .where(eq(pontosFisicos.id, novoPontoId));
+  }
+
+  // Se passou fotoLocalUrl e tem ponto físico vinculado, atualiza a foto do ponto
+  if (formData.fotoLocalUrl !== undefined && novoPontoId) {
+    await db
+      .update(pontosFisicos)
+      .set({ fotoLocalUrl: formData.fotoLocalUrl })
+      .where(eq(pontosFisicos.id, novoPontoId));
+  }
+
+  await db
+    .update(midiasCampanha)
+    .set({
+      fornecedorId: formData.fornecedorId ?? midiaAtual.fornecedorId,
+      pontoFisicoId: novoPontoId || null,
+      categoriaMidia: formData.categoriaMidia ?? midiaAtual.categoriaMidia,
+      subtipoMidia: formData.subtipoMidia ?? midiaAtual.subtipoMidia,
+      formatoPeca: formData.formatoPeca ?? midiaAtual.formatoPeca,
+      tipoRegraPrazo: formData.biSemana ? "BISEMANA_FIXA" : (formData.dataInicio ? "MANUAL_DATAS" : midiaAtual.tipoRegraPrazo),
+      biSemana: formData.biSemana !== undefined ? formData.biSemana : midiaAtual.biSemana,
+      dataInicio: formData.dataInicio ?? midiaAtual.dataInicio,
+      dataFim: formData.dataFim ?? midiaAtual.dataFim,
+      statusVeiculacao: formData.statusVeiculacao ?? midiaAtual.statusVeiculacao,
+      tipoAcaoFinal: formData.tipoAcaoFinal !== undefined ? formData.tipoAcaoFinal : midiaAtual.tipoAcaoFinal,
+      valorNegociado: formData.valorNegociado !== undefined ? formData.valorNegociado : midiaAtual.valorNegociado,
+      numPI: formData.numPI !== undefined ? formData.numPI : midiaAtual.numPI,
+      observacoes: formData.observacoes !== undefined ? formData.observacoes : midiaAtual.observacoes,
+    })
+    .where(eq(midiasCampanha.id, id));
+
+  revalidatePath("/campanhas");
+  revalidatePath(`/campanhas/${midiaAtual.campanhaId}`);
+  revalidatePath("/pontos");
+  revalidatePath("/mapa");
+  revalidatePath("/");
+
+  return { success: true };
 }
 
 export async function excluirMidiaCampanha(midiaId: string) {

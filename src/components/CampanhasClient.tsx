@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { BrandBadge, StatusBadge, MediaCategoryBadge, CountdownBadge } from "@/components/BrandBadge";
 import { EditarCampanhaModal } from "@/components/EditarCampanhaModal";
+import { EditarMidiaModal } from "@/components/EditarMidiaModal";
 import { ExcluirCampanhaModal } from "@/components/ExcluirCampanhaModal";
 import { VincularMidiaModal } from "@/components/VincularMidiaModal";
 import { excluirMidiaCampanha } from "@/lib/actions";
@@ -94,6 +96,7 @@ export function CampanhasClient({
   pontosDisponiveis?: PontoFisico[];
   fornecedores?: Fornecedor[];
 }) {
+  const router = useRouter();
   const [empresaSelecionada, setEmpresaSelecionada] = useState<string>("TODAS");
   const [tipoMidiaFiltro, setTipoMidiaFiltro] = useState<string>("TODOS");
   const [apenasAtivos, setApenasAtivos] = useState<boolean>(true);
@@ -192,6 +195,7 @@ export function CampanhasClient({
     setExcluindoMidiaId(midiaId);
     try {
       await excluirMidiaCampanha(midiaId);
+      router.refresh();
     } catch (err) {
       console.error("Erro ao remover mídia:", err);
       alert("Erro ao remover mídia.");
@@ -476,6 +480,12 @@ export function CampanhasClient({
                                     <Phone className="w-3 h-3" /> WhatsApp
                                   </a>
                                 )}
+
+                                <EditarMidiaModal
+                                  midia={midia}
+                                  pontosDisponiveis={pontosDisponiveis}
+                                  fornecedores={fornecedores}
+                                />
 
                                 <button
                                   onClick={() => handleExcluirMidia(midia.id)}

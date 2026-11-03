@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { excluirCampanha } from "@/lib/actions";
 import { Trash2, X, AlertTriangle, CheckCircle2 } from "lucide-react";
 
@@ -15,6 +16,7 @@ export function ExcluirCampanhaModal({
   campanhaNome,
   onSucesso,
 }: ExcluirCampanhaModalProps) {
+  const router = useRouter();
   const [aberto, setAberto] = useState(false);
   const [excluindo, setExcluindo] = useState(false);
 
@@ -24,6 +26,7 @@ export function ExcluirCampanhaModal({
     try {
       await excluirCampanha(campanhaId);
       setAberto(false);
+      router.refresh();
       if (onSucesso) onSucesso();
     } catch (err) {
       console.error("Erro ao excluir campanha:", err);

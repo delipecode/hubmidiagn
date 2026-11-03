@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { editarCampanha } from "@/lib/actions";
 import { Edit3, X, Layers, Calendar, DollarSign, CheckCircle2 } from "lucide-react";
 
@@ -16,9 +17,11 @@ interface EditarCampanhaModalProps {
     orcamentoTotal: number | null;
   };
   onSucesso?: () => void;
+  className?: string;
 }
 
-export function EditarCampanhaModal({ campanha, onSucesso }: EditarCampanhaModalProps) {
+export function EditarCampanhaModal({ campanha, onSucesso, className }: EditarCampanhaModalProps) {
+  const router = useRouter();
   const [aberto, setAberto] = useState(false);
   const [salvando, setSalvando] = useState(false);
 
@@ -31,6 +34,18 @@ export function EditarCampanhaModal({ campanha, onSucesso }: EditarCampanhaModal
   const [orcamentoTotal, setOrcamentoTotal] = useState(
     campanha.orcamentoTotal ? campanha.orcamentoTotal.toString() : ""
   );
+
+  useEffect(() => {
+    if (aberto) {
+      setMarcaId(campanha.marcaId);
+      setNome(campanha.nome);
+      setObjetivo(campanha.objetivo || "");
+      setDataInicio(campanha.dataInicio);
+      setDataFim(campanha.dataFim);
+      setStatus(campanha.status);
+      setOrcamentoTotal(campanha.orcamentoTotal ? campanha.orcamentoTotal.toString() : "");
+    }
+  }, [campanha, aberto]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,6 +63,7 @@ export function EditarCampanhaModal({ campanha, onSucesso }: EditarCampanhaModal
       });
 
       setAberto(false);
+      router.refresh();
       if (onSucesso) onSucesso();
     } catch (err) {
       console.error("Erro ao editar campanha:", err);
@@ -61,7 +77,10 @@ export function EditarCampanhaModal({ campanha, onSucesso }: EditarCampanhaModal
     <>
       <button
         onClick={() => setAberto(true)}
-        className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center gap-1.5 transition-all border border-slate-200"
+        className={
+          className ||
+          "px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center gap-1.5 transition-all border border-slate-200"
+        }
         title="Editar Campanha"
       >
         <Edit3 className="w-3.5 h-3.5 text-slate-600" />
@@ -84,7 +103,7 @@ export function EditarCampanhaModal({ campanha, onSucesso }: EditarCampanhaModal
                     Editar Campanha
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Altere os dados, vigência e status da campanha
+                    Altere a empresa, dados gerais, vigência e status da campanha
                   </p>
                 </div>
               </div>

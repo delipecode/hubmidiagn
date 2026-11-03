@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { BrandBadge, StatusBadge, MediaCategoryBadge, CountdownBadge } from "@/components/BrandBadge";
 import { formatarData } from "@/lib/utils";
 import Link from "next/link";
@@ -29,6 +30,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { EditarCampanhaModal } from "@/components/EditarCampanhaModal";
+import { EditarMidiaModal } from "@/components/EditarMidiaModal";
 import { ExcluirCampanhaModal } from "@/components/ExcluirCampanhaModal";
 import { VincularMidiaModal } from "@/components/VincularMidiaModal";
 import { excluirMidiaCampanha } from "@/lib/actions";
@@ -108,6 +110,7 @@ export function CampanhaDetalheClient({
   pontosDisponiveis?: any[];
   fornecedores?: any[];
 }) {
+  const router = useRouter();
   const [canalFiltro, setCanalFiltro] = useState<string>("TODOS");
   const [busca, setBusca] = useState<string>("");
   const [deletandoMidiaId, setDeletandoMidiaId] = useState<string | null>(null);
@@ -174,6 +177,7 @@ export function CampanhaDetalheClient({
       setDeletandoMidiaId(midiaId);
       try {
         await excluirMidiaCampanha(midiaId);
+        router.refresh();
       } catch (err) {
         console.error(err);
         alert("Erro ao remover mídia.");
@@ -446,6 +450,11 @@ export function CampanhaDetalheClient({
                       />
                       <div className="flex items-center gap-1.5">
                         <StatusBadge status={midia.statusVeiculacao} />
+                        <EditarMidiaModal
+                          midia={midia}
+                          pontosDisponiveis={pontosDisponiveis}
+                          fornecedores={fornecedores}
+                        />
                         <button
                           onClick={() => handleRemoverMidia(midia.id)}
                           disabled={deletandoMidiaId === midia.id}

@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { criarCampanha } from "@/lib/actions";
 import { Plus, X, Layers, Calendar, DollarSign, CheckCircle2 } from "lucide-react";
 
 export function NovaCampanhaModal({ onSucesso }: { onSucesso?: () => void }) {
+  const router = useRouter();
   const [aberto, setAberto] = useState(false);
   const [salvando, setSalvando] = useState(false);
 
@@ -37,6 +39,7 @@ export function NovaCampanhaModal({ onSucesso }: { onSucesso?: () => void }) {
       setObjetivo("");
       setOrcamentoTotal("");
       setAberto(false);
+      router.refresh();
       if (onSucesso) onSucesso();
     } catch (err) {
       console.error("Erro ao salvar campanha:", err);
