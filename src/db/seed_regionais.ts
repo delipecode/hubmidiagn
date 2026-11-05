@@ -1,5 +1,5 @@
 import { db } from "./index";
-import { fornecedores, pontosFisicos, midiasCampanha, campanhas } from "./schema";
+import { fornecedores, pontosFisicos, midiasCampanha, campanhas, marcas } from "./schema";
 import { eq } from "drizzle-orm";
 
 export async function semearPontosRegionais() {
@@ -215,17 +215,70 @@ export async function semearPontosRegionais() {
     });
   }
 
-  // 3. VINCULAR VEICULAÇÕES DE CAMPANHA (UNIFAN & UNEF) NOS PONTOS ATIVOS
+  // 2.1 GARANTIR MARCAS REGIONAIS UNIFAN IPIRÁ E UNIFAN IRECÊ
+  await db
+    .insert(marcas)
+    .values([
+      {
+        id: "UNIFAN_IPIRA",
+        nome: "UNIFAN Ipirá",
+        corHex: "#059669",
+        corBg: "bg-emerald-500/15",
+        corBorder: "border-emerald-500/30",
+        corText: "text-emerald-400",
+      },
+      {
+        id: "UNIFAN_IRECE",
+        nome: "UNIFAN Irecê",
+        corHex: "#166534",
+        corBg: "bg-green-700/15",
+        corBorder: "border-green-700/30",
+        corText: "text-green-500",
+      },
+    ])
+    .onConflictDoNothing();
+
+  // 2.2 GARANTIR CAMPANHAS REGIONAIS DEDICADAS
+  await db
+    .insert(campanhas)
+    .values([
+      {
+        id: "CAMP-UNIFAN-IPIRA-2026",
+        marcaId: "UNIFAN_IPIRA",
+        marcasMultiplas: "UNIFAN_IPIRA",
+        nome: "Vestibular & Cursos UNIFAN Ipirá 2026",
+        objetivo: "Captação de alunos e consolidação acadêmica no Polo Ipirá / Bacia do Jacuípe.",
+        dataInicio: "2026-10-01",
+        dataFim: "2026-11-30",
+        status: "Ativa",
+        orcamentoTotal: 15000.0,
+        corDestaque: "#059669",
+      },
+      {
+        id: "CAMP-UNIFAN-IRECE-2026",
+        marcaId: "UNIFAN_IRECE",
+        marcasMultiplas: "UNIFAN_IRECE",
+        nome: "Vestibular & Cursos UNIFAN Irecê 2026",
+        objetivo: "Divulgação acadêmica e captação de graduação no Polo Regional de Irecê.",
+        dataInicio: "2026-10-01",
+        dataFim: "2026-11-30",
+        status: "Ativa",
+        orcamentoTotal: 18000.0,
+        corDestaque: "#166534",
+      },
+    ])
+    .onConflictDoNothing();
+
+  // 3. VINCULAR VEICULAÇÕES DE CAMPANHA (UNIFAN, UNIFAN IPIRÁ, UNIFAN IRECÊ E UNEF) NOS PONTOS ATIVOS
   const campanhasExistentes = await db.select().from(campanhas);
-  const campUnifan = campanhasExistentes.find((c) => c.marcaId === "UNIFAN") || campanhasExistentes[0];
   const campUnef = campanhasExistentes.find((c) => c.marcaId === "UNEF") || campanhasExistentes[0];
 
   const midiasRegionais = [
-    // Ipirá - Outdoor Trevo BA-052 (UNIFAN)
+    // Ipirá - Outdoor Trevo BA-052 (UNIFAN Ipirá)
     {
       id: "MIDIA-IPIRA-01",
-      campanhaId: campUnifan ? campUnifan.id : "CAMP-UNIFAN-POS-2026",
-      marcaId: "UNIFAN",
+      campanhaId: "CAMP-UNIFAN-IPIRA-2026",
+      marcaId: "UNIFAN_IPIRA",
       fornecedorId: "FORN-IPIRA-OOH",
       pontoFisicoId: "PONTO-IPIRA-BA052-ENTRADA",
       categoriaMidia: "OFFLINE",
@@ -233,6 +286,7 @@ export async function semearPontosRegionais() {
       formatoPeca: "Outdoor Lona 9,00 x 3,00m Iluminado",
       tipoRegraPrazo: "BISEMANA_FIXA",
       biSemana: "BS 21 (06/10 a 19/10)",
+      dataContrato: "2026-10-01",
       dataInicio: "2026-10-06",
       dataFim: "2026-10-19",
       statusVeiculacao: "No Ar / Ativo",
@@ -241,11 +295,11 @@ export async function semearPontosRegionais() {
       numPI: "PI-2026-IPIRA-01",
       observacoes: "Campanha Vestibular UNIFAN Polo Ipirá na rodovia BA-052.",
     },
-    // Ipirá - LED Praça Roberto Cintra (UNIFAN)
+    // Ipirá - LED Praça Roberto Cintra (UNIFAN Ipirá)
     {
       id: "MIDIA-IPIRA-02",
-      campanhaId: campUnifan ? campUnifan.id : "CAMP-UNIFAN-POS-2026",
-      marcaId: "UNIFAN",
+      campanhaId: "CAMP-UNIFAN-IPIRA-2026",
+      marcaId: "UNIFAN_IPIRA",
       fornecedorId: "FORN-IPIRA-OOH",
       pontoFisicoId: "PONTO-IPIRA-PRACA-ROBERTO-CINTRA",
       categoriaMidia: "OFFLINE",
@@ -253,6 +307,7 @@ export async function semearPontosRegionais() {
       formatoPeca: "Vídeo LED 15s (1080x540)",
       tipoRegraPrazo: "MANUAL_DATAS",
       biSemana: "Outubro 2026",
+      dataContrato: "2026-10-01",
       dataInicio: "2026-10-01",
       dataFim: "2026-10-31",
       statusVeiculacao: "No Ar / Ativo",
@@ -273,6 +328,7 @@ export async function semearPontosRegionais() {
       formatoPeca: "Outdoor Mega Lona (10,00 x 3,50m)",
       tipoRegraPrazo: "BISEMANA_FIXA",
       biSemana: "BS 21 (06/10 a 19/10)",
+      dataContrato: "2026-10-01",
       dataInicio: "2026-10-06",
       dataFim: "2026-10-19",
       statusVeiculacao: "No Ar / Ativo",
@@ -281,11 +337,11 @@ export async function semearPontosRegionais() {
       numPI: "PI-2026-IRECE-01",
       observacoes: "Campanha Vestibular Medicina UNEF no pórtico de Irecê.",
     },
-    // Irecê - Outdoor Av. Santos Lopes (UNIFAN)
+    // Irecê - Outdoor Av. Santos Lopes (UNIFAN Irecê)
     {
       id: "MIDIA-IRECE-02",
-      campanhaId: campUnifan ? campUnifan.id : "CAMP-UNIFAN-POS-2026",
-      marcaId: "UNIFAN",
+      campanhaId: "CAMP-UNIFAN-IRECE-2026",
+      marcaId: "UNIFAN_IRECE",
       fornecedorId: "FORN-IRECE-OOH",
       pontoFisicoId: "PONTO-IRECE-SANTOS-LOPES",
       categoriaMidia: "OFFLINE",
@@ -293,13 +349,14 @@ export async function semearPontosRegionais() {
       formatoPeca: "Outdoor Lona 9,00 x 3,00m",
       tipoRegraPrazo: "BISEMANA_FIXA",
       biSemana: "BS 21 (06/10 a 19/10)",
+      dataContrato: "2026-10-01",
       dataInicio: "2026-10-06",
       dataFim: "2026-10-19",
       statusVeiculacao: "No Ar / Ativo",
       tipoAcaoFinal: "Troca de Lona/Adesivo",
       valorNegociado: 1600.0,
       numPI: "PI-2026-IRECE-02",
-      observacoes: "Divulgação dos cursos da área de saúde e direito no centro financeiro.",
+      observacoes: "Divulgação dos cursos da área de saúde e direito no centro financeiro de Irecê.",
     },
     // Irecê - Painel de LED Praça Ayrton Senna (UNEF)
     {
@@ -331,4 +388,13 @@ export async function semearPontosRegionais() {
   }
 
   console.log("✅ Praças de Ipirá e Irecê semeadas com sucesso!");
+}
+
+if (process.argv[1]?.includes("seed_regionais")) {
+  semearPontosRegionais()
+    .then(() => process.exit(0))
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    });
 }

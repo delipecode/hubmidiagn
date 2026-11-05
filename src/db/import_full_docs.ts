@@ -66,6 +66,22 @@ export async function importFullData() {
       corText: "text-blue-400",
     },
     {
+      id: "UNIFAN_IPIRA",
+      nome: "UNIFAN Ipirá",
+      corHex: "#059669",
+      corBg: "bg-emerald-500/15",
+      corBorder: "border-emerald-500/30",
+      corText: "text-emerald-400",
+    },
+    {
+      id: "UNIFAN_IRECE",
+      nome: "UNIFAN Irecê",
+      corHex: "#166534",
+      corBg: "bg-green-700/15",
+      corBorder: "border-green-700/30",
+      corText: "text-green-500",
+    },
+    {
       id: "NOBRE",
       nome: "Colégio Nobre",
       corHex: "#0284C7",

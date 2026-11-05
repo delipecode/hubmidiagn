@@ -121,8 +121,18 @@ export function CampanhasClient({
     },
     {
       id: "UNIFAN",
-      label: "UNIFAN",
+      label: "UNIFAN (Sede)",
       count: campanhas.filter((c) => c.marcaId === "UNIFAN" || c.marcasMultiplas?.includes("UNIFAN")).length,
+    },
+    {
+      id: "UNIFAN_IPIRA",
+      label: "UNIFAN Ipirá",
+      count: campanhas.filter((c) => c.marcaId === "UNIFAN_IPIRA" || c.marcasMultiplas?.includes("UNIFAN_IPIRA") || (c.marcasMultiplas?.includes("UNIFAN") && c.nome.includes("Ipirá"))).length,
+    },
+    {
+      id: "UNIFAN_IRECE",
+      label: "UNIFAN Irecê",
+      count: campanhas.filter((c) => c.marcaId === "UNIFAN_IRECE" || c.marcasMultiplas?.includes("UNIFAN_IRECE") || (c.marcasMultiplas?.includes("UNIFAN") && c.nome.includes("Irecê"))).length,
     },
     {
       id: "NOBRE",
@@ -246,6 +256,8 @@ export function CampanhasClient({
               if (emp.id === "MAPLE") activeStyle = "bg-[#E11D48] text-white border-[#E11D48] shadow-md shadow-rose-500/20";
               if (emp.id === "UNEF") activeStyle = "bg-[#F59E13] text-slate-950 font-black border-[#F59E13] shadow-md shadow-amber-500/20";
               if (emp.id === "UNIFAN") activeStyle = "bg-[#2563EB] text-white border-[#2563EB] shadow-md shadow-blue-500/20";
+              if (emp.id === "UNIFAN_IPIRA") activeStyle = "bg-[#059669] text-white border-[#059669] shadow-md shadow-emerald-500/20";
+              if (emp.id === "UNIFAN_IRECE") activeStyle = "bg-[#166534] text-white border-[#166534] shadow-md shadow-green-700/20";
               if (emp.id === "NOBRE") activeStyle = "bg-[#0284C7] text-white border-[#0284C7] shadow-md shadow-sky-500/20";
             }
 

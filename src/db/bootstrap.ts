@@ -32,6 +32,28 @@ export async function ensureDatabaseReady() {
           // Coluna já existe
         }
 
+        // Garante que as marcas regionais existam
+        try {
+          await client.execute(`
+            INSERT INTO marcas (id, nome, cor_hex, cor_bg, cor_border, cor_text)
+            VALUES 
+              ('UNIFAN_IPIRA', 'UNIFAN Ipirá', '#059669', 'bg-emerald-500/15', 'border-emerald-500/30', 'text-emerald-400'),
+              ('UNIFAN_IRECE', 'UNIFAN Irecê', '#166534', 'bg-green-700/15', 'border-green-700/30', 'text-green-500')
+            ON CONFLICT(id) DO UPDATE SET
+              nome = excluded.nome,
+              cor_hex = excluded.cor_hex;
+          `);
+        } catch {
+          // Já executado
+        }
+
+        // Garante as campanhas regionais de Ipirá e Irecê
+        try {
+          await semearPontosRegionais();
+        } catch (e) {
+          console.error("Aviso ao sincronizar regionais:", e);
+        }
+
         // Verifica se todos os pontos do catálogo já foram sincronizados (mínimo de 70 pontos)
         try {
           const checagemPontos = await client.execute("SELECT count(*) as total FROM pontos_fisicos;");

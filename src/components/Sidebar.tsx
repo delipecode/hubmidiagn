@@ -276,7 +276,7 @@ export function Sidebar() {
           </div>
 
           <div className="text-[10px] text-center font-bold text-slate-500 tracking-wider">
-            UNEF • UNIFAN • NOBRE • MAPLE
+            UNEF • UNIFAN • IPIRÁ • IRECÊ • NOBRE • MAPLE
           </div>
         </div>
 

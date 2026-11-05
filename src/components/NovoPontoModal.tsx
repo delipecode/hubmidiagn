@@ -453,6 +453,8 @@ export function NovoPontoModal({
                         >
                           <option value="UNEF">UNEF (Laranja)</option>
                           <option value="UNIFAN">UNIFAN (Azul Royal)</option>
+                          <option value="UNIFAN_IPIRA">UNIFAN Ipirá (Verde Esmeralda)</option>
+                          <option value="UNIFAN_IRECE">UNIFAN Irecê (Verde Floresta)</option>
                           <option value="NOBRE">Colégio Nobre (Azul Claro)</option>
                           <option value="MAPLE">Maple Bear (Vermelho)</option>
                         </select>

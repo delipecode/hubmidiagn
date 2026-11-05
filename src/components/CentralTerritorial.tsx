@@ -307,6 +307,14 @@ export function CentralTerritorial({
           corPin = "#2563EB";
           marcaLabel = "UNIFAN";
           marcaBadgeStyle = "background: #2563EB; color: #ffffff; font-weight: 800;";
+        } else if (midiaAtiva.marcaId === "UNIFAN_IPIRA" || midiaAtiva.marcaId === "UNIFAN IPIRÁ") {
+          corPin = "#059669";
+          marcaLabel = "UNIFAN Ipirá";
+          marcaBadgeStyle = "background: #059669; color: #ffffff; font-weight: 800;";
+        } else if (midiaAtiva.marcaId === "UNIFAN_IRECE" || midiaAtiva.marcaId === "UNIFAN IRECÊ") {
+          corPin = "#166534";
+          marcaLabel = "UNIFAN Irecê";
+          marcaBadgeStyle = "background: #166534; color: #ffffff; font-weight: 800;";
         } else if (midiaAtiva.marcaId === "NOBRE") {
           corPin = "#0284C7";
           marcaLabel = "Colégio Nobre";
@@ -598,6 +606,26 @@ export function CentralTerritorial({
               UNIFAN
             </button>
             <button
+              onClick={() => setFiltroMarca("UNIFAN_IPIRA")}
+              className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                filtroMarca === "UNIFAN_IPIRA"
+                  ? "bg-[#059669] text-white shadow-sm ring-2 ring-emerald-700"
+                  : "text-emerald-900 bg-emerald-100/90 hover:bg-emerald-200"
+              }`}
+            >
+              Ipirá
+            </button>
+            <button
+              onClick={() => setFiltroMarca("UNIFAN_IRECE")}
+              className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                filtroMarca === "UNIFAN_IRECE"
+                  ? "bg-[#166534] text-white shadow-sm ring-2 ring-green-900"
+                  : "text-green-900 bg-green-100/90 hover:bg-green-200"
+              }`}
+            >
+              Irecê
+            </button>
+            <button
               onClick={() => setFiltroMarca("NOBRE")}
               className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
                 filtroMarca === "NOBRE"
@@ -699,6 +727,12 @@ export function CentralTerritorial({
                 </span>
                 <span className="flex items-center gap-1.5 text-xs text-blue-950 font-black">
                   <span className="w-3 h-3 rounded-full bg-[#2563EB]" /> UNIFAN
+                </span>
+                <span className="flex items-center gap-1.5 text-xs text-emerald-950 font-black">
+                  <span className="w-3 h-3 rounded-full bg-[#059669]" /> Ipirá
+                </span>
+                <span className="flex items-center gap-1.5 text-xs text-green-950 font-black">
+                  <span className="w-3 h-3 rounded-full bg-[#166534]" /> Irecê
                 </span>
                 <span className="flex items-center gap-1.5 text-xs text-sky-950 font-black">
                   <span className="w-3 h-3 rounded-full bg-[#0284C7]" /> Nobre

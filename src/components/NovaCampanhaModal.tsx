@@ -18,12 +18,30 @@ const OPCOES_MARCAS = [
   },
   {
     id: "UNIFAN",
-    nome: "UNIFAN",
-    descricao: "Centro Universitário Nobre",
+    nome: "UNIFAN (Sede)",
+    descricao: "Centro Universitário Nobre Feira",
     corBadge: "bg-[#2563EB] text-white",
     corBordaAtiva: "border-blue-600 bg-blue-50/60",
     corCheck: "bg-blue-600 text-white",
     corDot: "bg-blue-600",
+  },
+  {
+    id: "UNIFAN_IPIRA",
+    nome: "UNIFAN Ipirá",
+    descricao: "Polo Regional Ipirá & BA-052",
+    corBadge: "bg-[#059669] text-white",
+    corBordaAtiva: "border-emerald-600 bg-emerald-50/60",
+    corCheck: "bg-emerald-600 text-white",
+    corDot: "bg-emerald-600",
+  },
+  {
+    id: "UNIFAN_IRECE",
+    nome: "UNIFAN Irecê",
+    descricao: "Polo Regional Chapada & Irecê",
+    corBadge: "bg-[#166534] text-white",
+    corBordaAtiva: "border-green-800 bg-green-50/60",
+    corCheck: "bg-green-800 text-white",
+    corDot: "bg-green-800",
   },
   {
     id: "NOBRE",
@@ -74,7 +92,7 @@ export function NovaCampanhaModal({ onSucesso }: { onSucesso?: () => void }) {
   };
 
   const selecionarTodas = () => {
-    setMarcasSelecionadas(["UNEF", "UNIFAN", "NOBRE", "MAPLE"]);
+    setMarcasSelecionadas(["UNEF", "UNIFAN", "UNIFAN_IPIRA", "UNIFAN_IRECE", "NOBRE", "MAPLE"]);
   };
 
   const selecionarApenas = (id: string) => {
