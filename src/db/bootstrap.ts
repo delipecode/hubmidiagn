@@ -1,6 +1,7 @@
 import { client, db } from "./index";
 import { importFullData } from "./import_full_docs";
 import { semearPontosRegionais } from "./seed_regionais";
+import { sincronizarCatalogoCompleto } from "./seed_catalogo_completo";
 import { marcas } from "./schema";
 
 let isBootstrapping = false;
@@ -17,14 +18,16 @@ export async function ensureDatabaseReady() {
     try {
       const checagem = await client.execute("SELECT id FROM marcas LIMIT 1;");
       if (checagem.rows && checagem.rows.length > 0) {
-        // Verifica se as praças regionais (Ipirá e Irecê) já foram semeadas
+        // Verifica se todos os pontos do catálogo já foram sincronizados (mínimo de 70 pontos)
         try {
-          const checagemPracas = await client.execute("SELECT id FROM pontos_fisicos WHERE praca = 'Ipirá' LIMIT 1;");
-          if (!checagemPracas.rows || checagemPracas.rows.length === 0) {
+          const checagemPontos = await client.execute("SELECT count(*) as total FROM pontos_fisicos;");
+          const totalPontos = Number(checagemPontos.rows[0]?.total ?? 0);
+          if (totalPontos < 70) {
             await semearPontosRegionais();
+            await sincronizarCatalogoCompleto();
           }
         } catch (e) {
-          console.error("Aviso ao checar praças regionais:", e);
+          console.error("Aviso ao checar pontos do catálogo:", e);
         }
 
         isBootstrapped = true;
@@ -137,7 +140,8 @@ export async function ensureDatabaseReady() {
       console.log("🌱 Banco novo detectado no Turso/SQLite. Populando catálogo oficial...");
       await importFullData();
       await semearPontosRegionais();
-      console.log("✅ Catálogo oficial e praças regionais importados com sucesso!");
+      await sincronizarCatalogoCompleto();
+      console.log("✅ Catálogo oficial, praças regionais e pontos completos importados com sucesso!");
     }
 
     isBootstrapped = true;
