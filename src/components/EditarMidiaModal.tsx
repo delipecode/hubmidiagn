@@ -202,8 +202,31 @@ export function EditarMidiaModal({
             {/* FORMULÁRIO */}
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               
-              {/* STATUS & TIPO AÇÃO FINAL */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* STATUS, TIPO DE MÍDIA & TIPO AÇÃO FINAL */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">
+                    Tipo de Mídia:
+                  </label>
+                  <select
+                    value={subtipoMidia}
+                    onChange={(e) => setSubtipoMidia(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-blue-500 focus:bg-white font-bold"
+                  >
+                    <option value="OUTDOOR_BISEMANA">Outdoor (Bi-Semana)</option>
+                    <option value="PANFLETO">📄 Panfleto / Flyer Impresso</option>
+                    <option value="INDOOR_ACADEMIA">Mídia Indoor • Academia</option>
+                    <option value="INDOOR_TELAS">Mídia Indoor • Telas Digitais</option>
+                    <option value="LED_DIGITAL">Painel de LED Digital</option>
+                    <option value="RADIO">Rádio FM/AM</option>
+                    <option value="TV">Mídia de TV</option>
+                    <option value="BUSDOOR">Busdoor</option>
+                    <option value="META_ADS">Meta Ads (Feed/Stories)</option>
+                    <option value="GOOGLE_ADS">Google Ads & YouTube</option>
+                    <option value="PORTAL_NOTICIAS">Portal de Notícias</option>
+                  </select>
+                </div>
+
                 <div>
                   <label className="block text-slate-700 font-semibold mb-1">
                     Status de Veiculação:
@@ -229,6 +252,8 @@ export function EditarMidiaModal({
                     onChange={(e) => setTipoAcaoFinal(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-blue-500 focus:bg-white font-bold"
                   >
+                    <option value="Conclusão da Panfletagem">Conclusão da Panfletagem</option>
+                    <option value="Reimpressão / Reposição">Reimpressão / Reposição</option>
                     <option value="Troca de Lona/Adesivo">Troca de Lona/Adesivo</option>
                     <option value="Renovação Contrato">Renovação Contrato</option>
                     <option value="Desmobilização Definitiva">Desmobilização Definitiva</option>

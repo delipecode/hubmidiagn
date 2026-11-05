@@ -29,6 +29,7 @@ import {
   Filter,
   Check,
   Trash2,
+  FileText,
 } from "lucide-react";
 
 interface PontoFisico {
@@ -133,6 +134,7 @@ export function CampanhasClient({
   const tiposMidiaOptions = [
     { id: "TODOS", label: "Todas as Mídias", icon: Layers },
     { id: "OUTDOOR", label: "Outdoors", icon: Building2 },
+    { id: "PANFLETO", label: "Panfletos / Flyers", icon: FileText },
     { id: "INDOOR_TELAS", label: "TV Indoor / Telas", icon: MonitorPlay },
     { id: "LED", label: "Painéis de LED", icon: MonitorPlay },
     { id: "ACADEMIA", label: "Adesivos / Academias", icon: Dumbbell },
@@ -145,6 +147,7 @@ export function CampanhasClient({
   const matchesTipoMidia = (m: MidiaCampanha, tipo: string) => {
     if (tipo === "TODOS") return true;
     if (tipo === "OUTDOOR") return m.subtipoMidia === "OUTDOOR_BISEMANA" || m.subtipoMidia === "BUSDOOR";
+    if (tipo === "PANFLETO") return m.subtipoMidia === "PANFLETO" || m.subtipoMidia?.includes("PANFLETO");
     if (tipo === "INDOOR_TELAS") return m.subtipoMidia === "INDOOR_TELAS";
     if (tipo === "LED") return m.subtipoMidia === "LED_DIGITAL";
     if (tipo === "ACADEMIA") return m.subtipoMidia === "INDOOR_ACADEMIA";

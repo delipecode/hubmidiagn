@@ -28,6 +28,7 @@ import {
   Trash2,
   Plus,
   Loader2,
+  FileText,
 } from "lucide-react";
 import { EditarCampanhaModal } from "@/components/EditarCampanhaModal";
 import { EditarMidiaModal } from "@/components/EditarMidiaModal";
@@ -123,6 +124,7 @@ export function CampanhaDetalheClient({
   // Contadores por canal
   const contadores = useMemo(() => {
     let outdoors = 0;
+    let panfletos = 0;
     let radios = 0;
     let indoor = 0;
     let leds = 0;
@@ -131,6 +133,7 @@ export function CampanhaDetalheClient({
 
     campanha.midias.forEach((m) => {
       if (m.subtipoMidia === "OUTDOOR_BISEMANA" || m.subtipoMidia === "BUSDOOR") outdoors++;
+      else if (m.subtipoMidia === "PANFLETO") panfletos++;
       else if (m.subtipoMidia === "RADIO") radios++;
       else if (m.subtipoMidia === "INDOOR_ACADEMIA" || m.subtipoMidia === "INDOOR_TELAS") indoor++;
       else if (m.subtipoMidia === "LED_DIGITAL") leds++;
@@ -140,6 +143,7 @@ export function CampanhaDetalheClient({
 
     return {
       outdoors,
+      panfletos,
       radios,
       indoor,
       leds,
@@ -164,6 +168,7 @@ export function CampanhaDetalheClient({
 
       if (canalFiltro === "TODOS") return true;
       if (canalFiltro === "OUTDOOR") return m.subtipoMidia === "OUTDOOR_BISEMANA" || m.subtipoMidia === "BUSDOOR";
+      if (canalFiltro === "PANFLETO") return m.subtipoMidia === "PANFLETO";
       if (canalFiltro === "RADIO") return m.subtipoMidia === "RADIO";
       if (canalFiltro === "INDOOR") return m.subtipoMidia === "INDOOR_ACADEMIA" || m.subtipoMidia === "INDOOR_TELAS";
       if (canalFiltro === "LED") return m.subtipoMidia === "LED_DIGITAL";
@@ -310,6 +315,20 @@ export function CampanhaDetalheClient({
                 <Building2 className="w-3 h-3" /> Outdoors
               </div>
               <div className="font-display text-xl font-extrabold">{contadores.outdoors}</div>
+            </button>
+
+            <button
+              onClick={() => setCanalFiltro("PANFLETO")}
+              className={`p-3 rounded-xl border text-left transition-all ${
+                canalFiltro === "PANFLETO"
+                  ? "bg-fuchsia-600 text-white border-fuchsia-600 shadow-sm"
+                  : "bg-fuchsia-50/50 hover:bg-fuchsia-50 text-slate-900 border-fuchsia-200"
+              }`}
+            >
+              <div className="text-[10px] font-bold uppercase text-fuchsia-700 flex items-center gap-1">
+                <FileText className="w-3 h-3" /> Panfletos
+              </div>
+              <div className="font-display text-xl font-extrabold">{contadores.panfletos}</div>
             </button>
 
             <button

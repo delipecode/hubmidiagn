@@ -247,6 +247,8 @@ export function NovoPontoModal({
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
                     >
                       <option value="Outdoor Lona 9x3m">Outdoor Lona 9x3m (Bi-Semana)</option>
+                      <option value="Panfletagem / Ponto de Ação">Panfletagem / Ponto de Ação (Distribuição)</option>
+                      <option value="Panfleto 10x15cm (Couché)">Panfleto 10x15cm (Couché 115g)</option>
                       <option value="Adesivo em Academia">Adesivo em Academia (Espelho/Catraca)</option>
                       <option value="Painel de LED">Painel de LED (Vídeo 10s)</option>
                       <option value="Busdoor">Busdoor (Traseira de Ônibus)</option>

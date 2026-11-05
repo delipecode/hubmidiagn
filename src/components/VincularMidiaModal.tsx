@@ -140,14 +140,19 @@ export function VincularMidiaModal({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setTipoCanal("CANAL_DIRETO")}
+                  onClick={() => {
+                    setTipoCanal("CANAL_DIRETO");
+                    setSubtipoMidia("PANFLETO");
+                    setFormatoPeca("Panfleto 10x15cm (Couché 115g 4x4)");
+                    setTipoAcaoFinal("Conclusão da Panfletagem");
+                  }}
                   className={`py-2 rounded-lg font-bold transition-all text-xs ${
                     tipoCanal === "CANAL_DIRETO"
                       ? "bg-white text-blue-700 shadow-sm"
                       : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
-                  📻 Rádio, TV ou Digital
+                  📄 Panfleto, Rádio, TV ou Digital
                 </button>
               </div>
 
@@ -164,6 +169,7 @@ export function VincularMidiaModal({
                       if (p) {
                         setFormatoPeca(p.tipoFormato);
                         if (p.tipoFormato.includes("Outdoor")) setSubtipoMidia("OUTDOOR_BISEMANA");
+                        else if (p.tipoFormato.includes("Panfleto") || p.tipoFormato.includes("Panfletagem")) setSubtipoMidia("PANFLETO");
                         else if (p.tipoFormato.includes("Academia")) setSubtipoMidia("INDOOR_ACADEMIA");
                         else if (p.tipoFormato.includes("LED")) setSubtipoMidia("LED_DIGITAL");
                         else if (p.tipoFormato.includes("Tela")) setSubtipoMidia("INDOOR_TELAS");
@@ -182,7 +188,7 @@ export function VincularMidiaModal({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-slate-700 font-semibold mb-1">
-                      Veículo / Fornecedor:
+                      Veículo / Fornecedor / Gráfica:
                     </label>
                     <select
                       value={fornecedorId}
@@ -203,14 +209,34 @@ export function VincularMidiaModal({
                     </label>
                     <select
                       value={subtipoMidia}
-                      onChange={(e) => setSubtipoMidia(e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setSubtipoMidia(val);
+                        if (val === "PANFLETO") {
+                          setFormatoPeca("Panfleto 10x15cm (Couché 115g 4x4)");
+                          setTipoAcaoFinal("Conclusão da Panfletagem");
+                        } else if (val === "RADIO") {
+                          setFormatoPeca("Spot 30s (WAV)");
+                          setTipoAcaoFinal("Renovação Contrato");
+                        } else if (val === "TV") {
+                          setFormatoPeca("VT Comercial 30s (Full HD)");
+                          setTipoAcaoFinal("Renovação Contrato");
+                        } else if (val === "META_ADS") {
+                          setFormatoPeca("Feed (1080x1350) + Stories (1080x1920)");
+                          setTipoAcaoFinal("Pausar Anúncios");
+                        } else if (val === "GOOGLE_ADS") {
+                          setFormatoPeca("Search + PMax + Vídeo");
+                          setTipoAcaoFinal("Pausar Anúncios");
+                        }
+                      }}
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-blue-500 font-semibold"
                     >
-                      <option value="RADIO">Rádio FM (Spots / Inserções)</option>
-                      <option value="TV">Mídia de TV (VTs Comerciais)</option>
-                      <option value="META_ADS">Meta Ads (Feed & Stories)</option>
-                      <option value="GOOGLE_ADS">Google Ads / YouTube</option>
-                      <option value="PORTAL_NOTICIAS">Portal de Notícias</option>
+                      <option value="PANFLETO">📄 Panfleto / Flyer Impresso (Panfletagem)</option>
+                      <option value="RADIO">📻 Rádio FM (Spots / Inserções)</option>
+                      <option value="TV">📺 Mídia de TV (VTs Comerciais)</option>
+                      <option value="META_ADS">📱 Meta Ads (Feed & Stories)</option>
+                      <option value="GOOGLE_ADS">🎯 Google Ads / YouTube</option>
+                      <option value="PORTAL_NOTICIAS">🌐 Portal de Notícias</option>
                     </select>
                   </div>
                 </div>
@@ -268,6 +294,8 @@ export function VincularMidiaModal({
                     onChange={(e) => setTipoAcaoFinal(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-blue-500 font-semibold"
                   >
+                    <option value="Conclusão da Panfletagem">Conclusão da Panfletagem / Distribuição</option>
+                    <option value="Reimpressão de Lote">Reimpressão / Reposição de Lote</option>
                     <option value="Troca de Lona/Adesivo">Troca de Lona/Adesivo</option>
                     <option value="Renovação Contrato">Renovação de Contrato</option>
                     <option value="Retirada Definitiva">Retirada Definitiva / Desmobilização</option>

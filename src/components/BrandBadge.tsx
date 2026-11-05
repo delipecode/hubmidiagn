@@ -132,6 +132,7 @@ export function MediaCategoryBadge({
 }) {
   const subtiposConfig: Record<string, { label: string; bg: string; text: string; border: string; dot: string }> = {
     OUTDOOR_BISEMANA: { label: "Outdoor (Bi-Semana)", bg: "bg-blue-50", text: "text-blue-900 font-bold", border: "border-blue-200", dot: "bg-blue-600" },
+    PANFLETO: { label: "Panfleto / Impresso", bg: "bg-fuchsia-50", text: "text-fuchsia-950 font-bold", border: "border-fuchsia-300", dot: "bg-fuchsia-600" },
     INDOOR_ACADEMIA: { label: "Mídia Indoor • Academia", bg: "bg-emerald-50", text: "text-emerald-900 font-bold", border: "border-emerald-200", dot: "bg-emerald-600" },
     INDOOR_TELAS: { label: "Mídia Indoor • Telas Digitais", bg: "bg-teal-50", text: "text-teal-900 font-bold", border: "border-teal-200", dot: "bg-teal-600" },
     LED_DIGITAL: { label: "Painel de LED Digital", bg: "bg-amber-50", text: "text-amber-900 font-bold", border: "border-amber-200", dot: "bg-amber-600" },

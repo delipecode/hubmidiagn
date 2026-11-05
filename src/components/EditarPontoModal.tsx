@@ -353,6 +353,8 @@ export function EditarPontoModal({
                 <datalist id="lista-formatos-ponto">
                   <option value="Outdoor Lona 9x3m" />
                   <option value="Outdoor Iluminado 9x3m" />
+                  <option value="Panfletagem / Ponto de Ação (Distribuição)" />
+                  <option value="Panfleto 10x15cm (Couché 115g)" />
                   <option value="Adesivo em Academia (Espelho 120x60cm)" />
                   <option value="Painel de LED 6x3m" />
                   <option value="Tela Indoor 55 Pol" />
