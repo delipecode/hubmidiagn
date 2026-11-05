@@ -2,49 +2,51 @@ import { cn } from "@/lib/utils";
 
 interface BrandBadgeProps {
   marcaId: string;
+  marcasMultiplas?: string | null;
   className?: string;
 }
 
-export function BrandBadge({ marcaId, className }: BrandBadgeProps) {
-  const configs: Record<
-    string,
-    { label: string; bg: string; text: string; border: string; dot: string; glow: string }
-  > = {
-    UNEF: {
-      label: "UNEF",
-      bg: "bg-[#F59E13]",
-      text: "text-slate-950 font-black",
-      border: "border-amber-500",
-      dot: "bg-slate-950",
-      glow: "shadow-sm shadow-amber-500/20",
-    },
-    UNIFAN: {
-      label: "UNIFAN",
-      bg: "bg-[#2563EB]",
-      text: "text-white font-black",
-      border: "border-blue-600",
-      dot: "bg-white",
-      glow: "shadow-sm shadow-blue-500/20",
-    },
-    NOBRE: {
-      label: "Colégio Nobre",
-      bg: "bg-[#0284C7]",
-      text: "text-white font-black",
-      border: "border-sky-600",
-      dot: "bg-white",
-      glow: "shadow-sm shadow-sky-500/20",
-    },
-    MAPLE: {
-      label: "Maple Bear",
-      bg: "bg-[#E11D48]",
-      text: "text-white font-black",
-      border: "border-rose-600",
-      dot: "bg-white",
-      glow: "shadow-sm shadow-rose-500/20",
-    },
-  };
+const configs: Record<
+  string,
+  { label: string; bg: string; text: string; border: string; dot: string; glow: string }
+> = {
+  UNEF: {
+    label: "UNEF",
+    bg: "bg-[#F59E13]",
+    text: "text-slate-950 font-black",
+    border: "border-amber-500",
+    dot: "bg-slate-950",
+    glow: "shadow-sm shadow-amber-500/20",
+  },
+  UNIFAN: {
+    label: "UNIFAN",
+    bg: "bg-[#2563EB]",
+    text: "text-white font-black",
+    border: "border-blue-600",
+    dot: "bg-white",
+    glow: "shadow-sm shadow-blue-500/20",
+  },
+  NOBRE: {
+    label: "Colégio Nobre",
+    bg: "bg-[#0284C7]",
+    text: "text-white font-black",
+    border: "border-sky-600",
+    dot: "bg-white",
+    glow: "shadow-sm shadow-sky-500/20",
+  },
+  MAPLE: {
+    label: "Maple Bear",
+    bg: "bg-[#E11D48]",
+    text: "text-white font-black",
+    border: "border-rose-600",
+    dot: "bg-white",
+    glow: "shadow-sm shadow-rose-500/20",
+  },
+};
 
-  const config = configs[marcaId] || {
+function SingleBrandBadge({ marcaId, className }: { marcaId: string; className?: string }) {
+  const mClean = marcaId.trim().toUpperCase();
+  const config = configs[mClean] || {
     label: marcaId,
     bg: "bg-slate-800",
     text: "text-white font-bold",
@@ -68,6 +70,26 @@ export function BrandBadge({ marcaId, className }: BrandBadgeProps) {
       {config.label}
     </span>
   );
+}
+
+export function BrandBadge({ marcaId, marcasMultiplas, className }: BrandBadgeProps) {
+  const stringToParse = marcasMultiplas || marcaId || "";
+  const marcasList = stringToParse
+    .split(",")
+    .map((m) => m.trim())
+    .filter(Boolean);
+
+  if (marcasList.length > 1) {
+    return (
+      <div className="inline-flex flex-wrap items-center gap-1.5">
+        {marcasList.map((m) => (
+          <SingleBrandBadge key={m} marcaId={m} className={className} />
+        ))}
+      </div>
+    );
+  }
+
+  return <SingleBrandBadge marcaId={marcasList[0] || marcaId} className={className} />;
 }
 
 export function StatusBadge({ status }: { status: string }) {

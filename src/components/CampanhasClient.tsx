@@ -72,6 +72,7 @@ interface MidiaCampanha {
 interface Campanha {
   id: string;
   marcaId: string;
+  marcasMultiplas?: string | null;
   nome: string;
   objetivo: string | null;
   dataInicio: string;
@@ -103,13 +104,29 @@ export function CampanhasClient({
   const [busca, setBusca] = useState<string>("");
   const [excluindoMidiaId, setExcluindoMidiaId] = useState<string | null>(null);
 
-  // Marcas e seus contadores
+  // Marcas e seus contadores (considera marca principal e marcas múltiplas)
   const empresasList = [
-    { id: "TODAS", label: "Todas as Empresas", count: campanhas.length },
-    { id: "MAPLE", label: "Maple Bear", count: campanhas.filter((c) => c.marcaId === "MAPLE").length },
-    { id: "UNEF", label: "UNEF", count: campanhas.filter((c) => c.marcaId === "UNEF").length },
-    { id: "UNIFAN", label: "UNIFAN", count: campanhas.filter((c) => c.marcaId === "UNIFAN").length },
-    { id: "NOBRE", label: "Colégio Nobre", count: campanhas.filter((c) => c.marcaId === "NOBRE").length },
+    { id: "TODAS", label: "Todas as Marcas", count: campanhas.length },
+    {
+      id: "MAPLE",
+      label: "Maple Bear",
+      count: campanhas.filter((c) => c.marcaId === "MAPLE" || c.marcasMultiplas?.includes("MAPLE")).length,
+    },
+    {
+      id: "UNEF",
+      label: "UNEF",
+      count: campanhas.filter((c) => c.marcaId === "UNEF" || c.marcasMultiplas?.includes("UNEF")).length,
+    },
+    {
+      id: "UNIFAN",
+      label: "UNIFAN",
+      count: campanhas.filter((c) => c.marcaId === "UNIFAN" || c.marcasMultiplas?.includes("UNIFAN")).length,
+    },
+    {
+      id: "NOBRE",
+      label: "Colégio Nobre",
+      count: campanhas.filter((c) => c.marcaId === "NOBRE" || c.marcasMultiplas?.includes("NOBRE")).length,
+    },
   ];
 
   // Tipos de mídia para o menu seletor
@@ -141,8 +158,12 @@ export function CampanhasClient({
   const campanhasComMidiasFiltradas = useMemo(() => {
     return campanhas
       .filter((campanha) => {
-        // Filtro por Empresa
-        if (empresaSelecionada !== "TODAS" && campanha.marcaId !== empresaSelecionada) {
+        // Filtro por Marca (considera marcaId e marcasMultiplas)
+        if (
+          empresaSelecionada !== "TODAS" &&
+          campanha.marcaId !== empresaSelecionada &&
+          !campanha.marcasMultiplas?.includes(empresaSelecionada)
+        ) {
           return false;
         }
         return true;
@@ -330,8 +351,12 @@ export function CampanhasClient({
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-slate-200">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2.5">
-                    {/* NÍVEL 1: EMPRESA */}
-                    <BrandBadge marcaId={campanha.marcaId} className="text-xs px-3 py-1 font-black" />
+                    {/* NÍVEL 1: MARCAS */}
+                    <BrandBadge
+                      marcaId={campanha.marcaId}
+                      marcasMultiplas={campanha.marcasMultiplas}
+                      className="text-xs px-3 py-1 font-black"
+                    />
                     <span className="text-xs font-bold text-slate-400">›</span>
                     {/* NÍVEL 2: STATUS */}
                     <StatusBadge status={campanha.status} />

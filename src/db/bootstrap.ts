@@ -18,6 +18,13 @@ export async function ensureDatabaseReady() {
     try {
       const checagem = await client.execute("SELECT id FROM marcas LIMIT 1;");
       if (checagem.rows && checagem.rows.length > 0) {
+        // Garante que a coluna marcas_multiplas exista
+        try {
+          await client.execute("ALTER TABLE campanhas ADD COLUMN marcas_multiplas TEXT;");
+        } catch {
+          // Coluna já existe
+        }
+
         // Verifica se todos os pontos do catálogo já foram sincronizados (mínimo de 70 pontos)
         try {
           const checagemPontos = await client.execute("SELECT count(*) as total FROM pontos_fisicos;");
@@ -94,9 +101,16 @@ export async function ensureDatabaseReady() {
         data_fim TEXT NOT NULL,
         status TEXT NOT NULL DEFAULT 'Ativa',
         orcamento_total REAL,
-        cor_destaque TEXT
+        cor_destaque TEXT,
+        marcas_multiplas TEXT
       );
     `);
+
+    try {
+      await client.execute("ALTER TABLE campanhas ADD COLUMN marcas_multiplas TEXT;");
+    } catch {
+      // Coluna já existe
+    }
 
     await client.execute(`
       CREATE TABLE IF NOT EXISTS midias_campanha (

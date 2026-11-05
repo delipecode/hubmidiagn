@@ -210,7 +210,9 @@ export async function getFornecedoresComMidias() {
 }
 
 export async function criarCampanha(formData: {
-  marcaId: string;
+  marcaId?: string;
+  marcasIds?: string[];
+  modoMultiplo?: "UNIFICADA" | "INDIVIDUAL";
   nome: string;
   objetivo?: string;
   dataInicio: string;
@@ -218,29 +220,73 @@ export async function criarCampanha(formData: {
   status?: string;
   orcamentoTotal?: number;
 }) {
-  const id = `CAMP-${formData.marcaId}-${Date.now()}`;
-  
-  await db.insert(campanhas).values({
-    id,
-    marcaId: formData.marcaId,
-    nome: formData.nome,
-    objetivo: formData.objetivo,
-    dataInicio: formData.dataInicio,
-    dataFim: formData.dataFim,
-    status: formData.status || "Ativa",
-    orcamentoTotal: formData.orcamentoTotal,
-  });
+  const marcasList = formData.marcasIds && formData.marcasIds.length > 0
+    ? formData.marcasIds
+    : [formData.marcaId || "UNEF"];
 
-  revalidatePath("/campanhas");
-  revalidatePath("/dashboard");
-  revalidatePath("/pontos");
-  return { success: true, id };
+  const modo = formData.modoMultiplo || "UNIFICADA";
+
+  if (marcasList.length > 1 && modo === "INDIVIDUAL") {
+    // Cria uma campanha individual para cada marca selecionada
+    const orcamentoPorCampanha = formData.orcamentoTotal
+      ? Number((formData.orcamentoTotal / marcasList.length).toFixed(2))
+      : undefined;
+
+    const idsCriados: string[] = [];
+
+    for (const m of marcasList) {
+      const id = `CAMP-${m}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      const nomeCampanha = `${formData.nome} (${m})`;
+
+      await db.insert(campanhas).values({
+        id,
+        marcaId: m,
+        nome: nomeCampanha,
+        objetivo: formData.objetivo,
+        dataInicio: formData.dataInicio,
+        dataFim: formData.dataFim,
+        status: formData.status || "Ativa",
+        orcamentoTotal: orcamentoPorCampanha,
+        marcasMultiplas: m,
+      });
+      idsCriados.push(id);
+    }
+
+    revalidatePath("/campanhas");
+    revalidatePath("/dashboard");
+    revalidatePath("/pontos");
+    return { success: true, ids: idsCriados, totalCriadas: idsCriados.length };
+  } else {
+    // Campanha única (unificada com as marcas selecionadas ou marca única)
+    const marcaPrincipal = marcasList[0] || "UNEF";
+    const marcasStr = marcasList.join(", ");
+    const id = `CAMP-${marcaPrincipal}-${Date.now()}`;
+
+    await db.insert(campanhas).values({
+      id,
+      marcaId: marcaPrincipal,
+      nome: formData.nome,
+      objetivo: formData.objetivo,
+      dataInicio: formData.dataInicio,
+      dataFim: formData.dataFim,
+      status: formData.status || "Ativa",
+      orcamentoTotal: formData.orcamentoTotal,
+      marcasMultiplas: marcasStr,
+    });
+
+    revalidatePath("/campanhas");
+    revalidatePath("/dashboard");
+    revalidatePath("/pontos");
+    return { success: true, id };
+  }
 }
 
 export async function editarCampanha(
   id: string,
   formData: {
     marcaId: string;
+    marcasMultiplas?: string;
+    marcasIds?: string[];
     nome: string;
     objetivo?: string;
     dataInicio: string;
@@ -249,10 +295,18 @@ export async function editarCampanha(
     orcamentoTotal?: number;
   }
 ) {
+  const marcasList = formData.marcasIds && formData.marcasIds.length > 0
+    ? formData.marcasIds
+    : (formData.marcasMultiplas || formData.marcaId).split(",").map(m => m.trim()).filter(Boolean);
+
+  const marcaPrincipal = marcasList[0] || formData.marcaId || "UNEF";
+  const marcasStr = marcasList.join(", ");
+
   await db
     .update(campanhas)
     .set({
-      marcaId: formData.marcaId,
+      marcaId: marcaPrincipal,
+      marcasMultiplas: marcasStr,
       nome: formData.nome,
       objetivo: formData.objetivo,
       dataInicio: formData.dataInicio,
@@ -265,7 +319,7 @@ export async function editarCampanha(
   // Atualizar marcaId em todas as mídias da campanha
   await db
     .update(midiasCampanha)
-    .set({ marcaId: formData.marcaId })
+    .set({ marcaId: marcaPrincipal })
     .where(eq(midiasCampanha.campanhaId, id));
 
   revalidatePath("/campanhas");

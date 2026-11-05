@@ -22,6 +22,7 @@ export const campanhas = sqliteTable("campanhas", {
   status: text("status").notNull().default("Ativa"), // 'Planejada', 'Ativa', 'Concluída'
   orcamentoTotal: real("orcamento_total"),
   corDestaque: text("cor_destaque"),
+  marcasMultiplas: text("marcas_multiplas"),
 });
 
 // 3. Fornecedores, Exibidoras & Veículos Contratados

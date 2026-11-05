@@ -86,6 +86,7 @@ interface MidiaCampanha {
 interface Campanha {
   id: string;
   marcaId: string;
+  marcasMultiplas?: string | null;
   nome: string;
   objetivo: string | null;
   dataInicio: string;
@@ -228,7 +229,11 @@ export function CampanhaDetalheClient({
         <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 pb-6 border-b border-slate-200">
           <div className="space-y-3 max-w-3xl">
             <div className="flex items-center gap-3">
-              <BrandBadge marcaId={campanha.marcaId} className="text-xs px-3 py-1 font-bold" />
+              <BrandBadge
+                marcaId={campanha.marcaId}
+                marcasMultiplas={campanha.marcasMultiplas}
+                className="text-xs px-3 py-1 font-bold"
+              />
               <StatusBadge status={campanha.status} />
             </div>
             <h1 className="font-display text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
