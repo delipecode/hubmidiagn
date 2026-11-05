@@ -367,6 +367,7 @@ export async function adicionarMidiaCampanha(formData: {
   subtipoMidia: string;
   formatoPeca: string;
   biSemana?: string;
+  dataContrato?: string;
   dataInicio: string;
   dataFim: string;
   statusVeiculacao?: string;
@@ -388,6 +389,7 @@ export async function adicionarMidiaCampanha(formData: {
     formatoPeca: formData.formatoPeca,
     tipoRegraPrazo: formData.biSemana ? "BISEMANA_FIXA" : "MANUAL_DATAS",
     biSemana: formData.biSemana || null,
+    dataContrato: formData.dataContrato || formData.dataInicio,
     dataInicio: formData.dataInicio,
     dataFim: formData.dataFim,
     statusVeiculacao: formData.statusVeiculacao || "No Ar / Ativo",
@@ -421,6 +423,7 @@ export async function editarMidiaCampanha(
     subtipoMidia?: string;
     formatoPeca?: string;
     biSemana?: string | null;
+    dataContrato?: string | null;
     dataInicio?: string;
     dataFim?: string;
     statusVeiculacao?: string;
@@ -488,6 +491,7 @@ export async function editarMidiaCampanha(
       formatoPeca: formData.formatoPeca ?? midiaAtual.formatoPeca,
       tipoRegraPrazo: formData.biSemana ? "BISEMANA_FIXA" : (formData.dataInicio ? "MANUAL_DATAS" : midiaAtual.tipoRegraPrazo),
       biSemana: formData.biSemana !== undefined ? formData.biSemana : midiaAtual.biSemana,
+      dataContrato: formData.dataContrato !== undefined ? formData.dataContrato : midiaAtual.dataContrato,
       dataInicio: formData.dataInicio ?? midiaAtual.dataInicio,
       dataFim: formData.dataFim ?? midiaAtual.dataFim,
       statusVeiculacao: formData.statusVeiculacao ?? midiaAtual.statusVeiculacao,
@@ -589,6 +593,7 @@ export async function criarPontoFisicoComMidia(formData: {
   campanhaId?: string;
   marcaId?: string;
   biSemana?: string;
+  dataContrato?: string;
   dataInicio?: string;
   dataFim?: string;
   tipoAcaoFinal?: string;
@@ -633,6 +638,7 @@ export async function criarPontoFisicoComMidia(formData: {
       formatoPeca: formData.tipoFormato,
       tipoRegraPrazo: formData.biSemana ? "BISEMANA_FIXA" : "MANUAL_DATAS",
       biSemana: formData.biSemana || "Mensal",
+      dataContrato: formData.dataContrato || formData.dataInicio || new Date().toISOString().split("T")[0],
       dataInicio: formData.dataInicio || new Date().toISOString().split("T")[0],
       dataFim: formData.dataFim || new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
       statusVeiculacao: "No Ar / Ativo",

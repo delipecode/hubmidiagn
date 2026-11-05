@@ -25,6 +25,13 @@ export async function ensureDatabaseReady() {
           // Coluna já existe
         }
 
+        // Garante que a coluna data_contrato exista
+        try {
+          await client.execute("ALTER TABLE midias_campanha ADD COLUMN data_contrato TEXT;");
+        } catch {
+          // Coluna já existe
+        }
+
         // Verifica se todos os pontos do catálogo já foram sincronizados (mínimo de 70 pontos)
         try {
           const checagemPontos = await client.execute("SELECT count(*) as total FROM pontos_fisicos;");
@@ -130,11 +137,18 @@ export async function ensureDatabaseReady() {
         status_veiculacao TEXT NOT NULL DEFAULT 'No Ar / Ativo',
         tipo_acao_final TEXT DEFAULT 'Renovação Contrato',
         num_pi TEXT,
+        data_contrato TEXT,
         valor_negociado REAL,
         link_material_drive TEXT,
         observacoes TEXT
       );
     `);
+
+    try {
+      await client.execute("ALTER TABLE midias_campanha ADD COLUMN data_contrato TEXT;");
+    } catch {
+      // Coluna já existe
+    }
 
     await client.execute(`
       CREATE TABLE IF NOT EXISTS checkings (

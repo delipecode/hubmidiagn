@@ -72,6 +72,7 @@ export function EditarMidiaModal({
   const [subtipoMidia, setSubtipoMidia] = useState(midia?.subtipoMidia || "OUTDOOR_BISEMANA");
   const [categoriaMidia, setCategoriaMidia] = useState(midia?.categoriaMidia || "OFFLINE");
   const [biSemana, setBiSemana] = useState(midia?.biSemana || "");
+  const [dataContrato, setDataContrato] = useState(midia?.dataContrato || "");
   const [dataInicio, setDataInicio] = useState(midia?.dataInicio || "");
   const [dataFim, setDataFim] = useState(midia?.dataFim || "");
   const [statusVeiculacao, setStatusVeiculacao] = useState(midia?.statusVeiculacao || "No Ar / Ativo");
@@ -93,6 +94,7 @@ export function EditarMidiaModal({
       setSubtipoMidia(midia.subtipoMidia || "OUTDOOR_BISEMANA");
       setCategoriaMidia(midia.categoriaMidia || "OFFLINE");
       setBiSemana(midia.biSemana || "");
+      setDataContrato(midia.dataContrato || "");
       setDataInicio(midia.dataInicio || "");
       setDataFim(midia.dataFim || "");
       setStatusVeiculacao(midia.statusVeiculacao || "No Ar / Ativo");
@@ -138,6 +140,7 @@ export function EditarMidiaModal({
         subtipoMidia,
         formatoPeca,
         biSemana: biSemana || null,
+        dataContrato: dataContrato || null,
         dataInicio,
         dataFim,
         statusVeiculacao,
@@ -319,8 +322,39 @@ export function EditarMidiaModal({
                 </div>
               </div>
 
-              {/* VALOR NEGOCIADO & NÚMERO DA PI */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* DADOS CONTRATUAIS E FINANCEIROS */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1 flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5 text-blue-600" /> Data do Contrato:
+                  </label>
+                  <input
+                    type="date"
+                    value={dataContrato}
+                    onChange={(e) => setDataContrato(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-blue-500 focus:bg-white font-semibold"
+                  />
+                  <span className="text-[10px] text-slate-400 mt-0.5 block">
+                    Assinatura/Fechamento
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">
+                    Número do PI / Contrato:
+                  </label>
+                  <input
+                    type="text"
+                    value={numPI}
+                    onChange={(e) => setNumPI(e.target.value)}
+                    placeholder="Ex: PI-2026-UNEF-042"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-blue-500 focus:bg-white font-medium"
+                  />
+                  <span className="text-[10px] text-slate-400 mt-0.5 block">
+                    Identificador contratual
+                  </span>
+                </div>
+
                 <div>
                   <label className="block text-slate-700 font-semibold mb-1 flex items-center gap-1">
                     <DollarSign className="w-3.5 h-3.5 text-emerald-600" /> Valor Negociado (R$):
@@ -333,19 +367,9 @@ export function EditarMidiaModal({
                     placeholder="Ex: 2450.00"
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-blue-500 focus:bg-white font-semibold"
                   />
-                </div>
-
-                <div>
-                  <label className="block text-slate-700 font-semibold mb-1">
-                    Número do PI / Pedido / Contrato:
-                  </label>
-                  <input
-                    type="text"
-                    value={numPI}
-                    onChange={(e) => setNumPI(e.target.value)}
-                    placeholder="Ex: PI-2026-UNEF-042"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-blue-500 focus:bg-white font-medium"
-                  />
+                  <span className="text-[10px] text-slate-400 mt-0.5 block">
+                    Custo total bruto
+                  </span>
                 </div>
               </div>
 

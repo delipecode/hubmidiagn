@@ -82,6 +82,7 @@ export const midiasCampanha = sqliteTable("midias_campanha", {
   tipoAcaoFinal: text("tipo_acao_final").default("Renovação Contrato"), // 'Troca de Lona/Adesivo', 'Retirada Definitiva', 'Renovação Contrato', 'Pausar Anúncios'
   
   // Financeiro & Contratual
+  dataContrato: text("data_contrato"),
   numPI: text("num_pi"),
   valorNegociado: real("valor_negociado"),
   linkMaterialDrive: text("link_material_drive"),

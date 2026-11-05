@@ -81,6 +81,7 @@ export function NovoPontoModal({
   const [campanhaId, setCampanhaId] = useState(campanhas[0]?.id || "");
   const [marcaId, setMarcaId] = useState("UNEF");
   const [biSemana, setBiSemana] = useState("BS 21 (06/10 a 19/10)");
+  const [dataContrato, setDataContrato] = useState("2026-10-06");
   const [dataInicio, setDataInicio] = useState("2026-10-06");
   const [dataFim, setDataFim] = useState("2026-10-19");
   const [tipoAcaoFinal, setTipoAcaoFinal] = useState("Troca de Lona/Adesivo");
@@ -150,6 +151,7 @@ export function NovoPontoModal({
         campanhaId,
         marcaId,
         biSemana,
+        dataContrato,
         dataInicio,
         dataFim,
         tipoAcaoFinal,
@@ -511,7 +513,18 @@ export function NovoPontoModal({
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                      <div>
+                        <label className="block text-slate-700 font-semibold mb-1">
+                          Data do Contrato:
+                        </label>
+                        <input
+                          type="date"
+                          value={dataContrato}
+                          onChange={(e) => setDataContrato(e.target.value)}
+                          className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-900"
+                        />
+                      </div>
                       <div>
                         <label className="block text-slate-700 font-semibold mb-1">
                           Ação ao Finalizar:
@@ -528,7 +541,7 @@ export function NovoPontoModal({
                       </div>
                       <div>
                         <label className="block text-slate-700 font-semibold mb-1">
-                          Número do PI:
+                          Número do PI / Contrato:
                         </label>
                         <input
                           type="text"
@@ -548,7 +561,7 @@ export function NovoPontoModal({
                           value={valorNegociado}
                           onChange={(e) => setValorNegociado(e.target.value)}
                           placeholder="3200.00"
-                          className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-semibold"
+                          className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-900"
                         />
                       </div>
                     </div>

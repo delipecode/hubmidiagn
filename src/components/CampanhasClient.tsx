@@ -59,6 +59,7 @@ interface MidiaCampanha {
   formatoPeca: string;
   tipoRegraPrazo: string;
   biSemana: string | null;
+  dataContrato?: string | null;
   dataInicio: string;
   dataFim: string;
   statusVeiculacao: string;
@@ -471,9 +472,22 @@ export function CampanhasClient({
                               )}
                             </div>
 
-                            {/* FORNECEDOR / VEÍCULO */}
-                            <div className="text-[11px] text-slate-500 font-semibold">
-                              Fornecedor: <span className="text-slate-800 font-bold">{midia.fornecedor.nome}</span>
+                            {/* FORNECEDOR / VEÍCULO & CONTRATO */}
+                            <div className="space-y-1">
+                              <div className="flex items-center justify-between text-[11px] text-slate-500 font-semibold">
+                                <span>Fornecedor: <strong className="text-slate-800">{midia.fornecedor.nome}</strong></span>
+                                {midia.numPI && (
+                                  <span className="font-mono text-[10px] text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
+                                    {midia.numPI}
+                                  </span>
+                                )}
+                              </div>
+                              {midia.dataContrato && (
+                                <div className="text-[10px] text-slate-500 flex items-center gap-1 font-medium">
+                                  <FileText className="w-3 h-3 text-slate-400 shrink-0" />
+                                  <span>Contrato: <strong className="text-slate-700">{formatarData(midia.dataContrato)}</strong></span>
+                                </div>
+                              )}
                             </div>
                           </div>
 
