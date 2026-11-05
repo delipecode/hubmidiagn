@@ -1,5 +1,6 @@
 import { client, db } from "./index";
 import { importFullData } from "./import_full_docs";
+import { semearPontosRegionais } from "./seed_regionais";
 import { marcas } from "./schema";
 
 let isBootstrapping = false;
@@ -12,10 +13,20 @@ export async function ensureDatabaseReady() {
   isBootstrapping = true;
 
   try {
-    // Verificação rápida: se a tabela marcas já existir e tiver dados, encerra imediatamente (0ms de overhead)
+    // Verificação rápida: se a tabela marcas já existir e tiver dados, verifica praças regionais e encerra
     try {
       const checagem = await client.execute("SELECT id FROM marcas LIMIT 1;");
       if (checagem.rows && checagem.rows.length > 0) {
+        // Verifica se as praças regionais (Ipirá e Irecê) já foram semeadas
+        try {
+          const checagemPracas = await client.execute("SELECT id FROM pontos_fisicos WHERE praca = 'Ipirá' LIMIT 1;");
+          if (!checagemPracas.rows || checagemPracas.rows.length === 0) {
+            await semearPontosRegionais();
+          }
+        } catch (e) {
+          console.error("Aviso ao checar praças regionais:", e);
+        }
+
         isBootstrapped = true;
         isBootstrapping = false;
         return;
@@ -125,7 +136,8 @@ export async function ensureDatabaseReady() {
     if (marcasExistentes.length === 0) {
       console.log("🌱 Banco novo detectado no Turso/SQLite. Populando catálogo oficial...");
       await importFullData();
-      console.log("✅ Catálogo oficial importado com sucesso!");
+      await semearPontosRegionais();
+      console.log("✅ Catálogo oficial e praças regionais importados com sucesso!");
     }
 
     isBootstrapped = true;

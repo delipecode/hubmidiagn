@@ -19,9 +19,49 @@ export function MapContainer({
   const currentTileLayerRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
 
+  const [pracaSelecionada, setPracaSelecionada] = useState("TODAS");
   const [filtroMarca, setFiltroMarca] = useState("TODAS");
   const [filtroStatus, setFiltroStatus] = useState("TODOS");
   const [estiloMapa, setEstiloMapa] = useState<"claro" | "satelite" | "dark">("claro");
+
+  const pracasCoordenadas: Record<string, { lat: number; lng: number; zoom: number; nome: string; desc: string }> = {
+    "Feira de Santana": {
+      lat: -12.2575,
+      lng: -38.9667,
+      zoom: 13,
+      nome: "Feira de Santana",
+      desc: "Hub Sede • UNEF, UNIFAN, Colégio Nobre e Maple Bear",
+    },
+    "Ipirá": {
+      lat: -12.1585,
+      lng: -39.7380,
+      zoom: 14,
+      nome: "Ipirá",
+      desc: "Pólo Universitário UNIFAN & Cobertura BA-052 Estrada do Feijão",
+    },
+    "Irecê": {
+      lat: -11.3050,
+      lng: -41.8550,
+      zoom: 14,
+      nome: "Irecê",
+      desc: "Polo Regional Chapada & Captação Medicina UNEF / UNIFAN",
+    },
+    "TODAS": {
+      lat: -11.85,
+      lng: -40.35,
+      zoom: 8,
+      nome: "Todas as Praças",
+      desc: "Visão Macro Integrada: Feira de Santana, Ipirá, Irecê e Rodovias",
+    },
+  };
+
+  const mudarPraca = (novaPraca: string) => {
+    setPracaSelecionada(novaPraca);
+    if (mapInstanceRef.current && pracasCoordenadas[novaPraca]) {
+      const { lat, lng, zoom } = pracasCoordenadas[novaPraca];
+      mapInstanceRef.current.flyTo([lat, lng], zoom, { duration: 1.2 });
+    }
+  };
 
   const camadas = {
     claro: {
@@ -97,7 +137,7 @@ export function MapContainer({
     import("leaflet").then((L) => {
       renderMarkers(L, mapInstanceRef.current);
     });
-  }, [filtroMarca, filtroStatus, pontos]);
+  }, [filtroMarca, filtroStatus, pracaSelecionada, pontos]);
 
   const aplicarCamadaMapa = (L: any, map: any, estilo: "dark" | "claro" | "satelite") => {
     if (currentTileLayerRef.current) {
@@ -149,6 +189,11 @@ export function MapContainer({
       const midiaAtiva = p.midias && p.midias.length > 0 ? p.midias[0] : null;
       const marcaPonto = midiaAtiva ? midiaAtiva.marcaId : null;
 
+      const matchPraca =
+        pracaSelecionada === "TODAS" ||
+        p.praca === pracaSelecionada ||
+        (pracaSelecionada === "Feira de Santana" && (!p.praca || p.praca === "Feira de Santana" || p.praca.includes("Feira")));
+
       const matchMarca =
         filtroMarca === "TODAS" ||
         (filtroMarca === "DISPONIVEIS" && !midiaAtiva) ||
@@ -159,7 +204,7 @@ export function MapContainer({
         (filtroStatus === "COMPRADOS" && p.statusPonto === "Comprado / Ativo") ||
         (filtroStatus === "DISPONIVEIS" && p.statusPonto === "Disponível / Mapeado");
 
-      return matchMarca && matchStatus;
+      return matchPraca && matchMarca && matchStatus;
     });
 
     pontosFiltrados.forEach((ponto) => {
@@ -265,6 +310,50 @@ export function MapContainer({
         {/* CONTROLES */}
         <div className="flex flex-wrap items-center gap-3">
           
+          {/* SELETOR DE PRAÇAS */}
+          <div className="flex items-center bg-slate-100 p-1.5 rounded-2xl border-2 border-slate-300 text-xs gap-1">
+            <button
+              onClick={() => mudarPraca("Feira de Santana")}
+              className={`px-3 py-1.5 text-xs rounded-xl font-extrabold transition-all cursor-pointer ${
+                pracaSelecionada === "Feira de Santana"
+                  ? "bg-blue-600 text-white shadow"
+                  : "text-slate-700 hover:text-slate-950"
+              }`}
+            >
+              Feira
+            </button>
+            <button
+              onClick={() => mudarPraca("Ipirá")}
+              className={`px-3 py-1.5 text-xs rounded-xl font-extrabold transition-all cursor-pointer ${
+                pracaSelecionada === "Ipirá"
+                  ? "bg-amber-500 text-slate-950 shadow font-black"
+                  : "text-slate-700 hover:text-slate-950"
+              }`}
+            >
+              Ipirá
+            </button>
+            <button
+              onClick={() => mudarPraca("Irecê")}
+              className={`px-3 py-1.5 text-xs rounded-xl font-extrabold transition-all cursor-pointer ${
+                pracaSelecionada === "Irecê"
+                  ? "bg-emerald-600 text-white shadow font-black"
+                  : "text-slate-700 hover:text-slate-950"
+              }`}
+            >
+              Irecê
+            </button>
+            <button
+              onClick={() => mudarPraca("TODAS")}
+              className={`px-3 py-1.5 text-xs rounded-xl font-extrabold transition-all cursor-pointer ${
+                pracaSelecionada === "TODAS"
+                  ? "bg-slate-950 text-white shadow"
+                  : "text-slate-700 hover:text-slate-950"
+              }`}
+            >
+              Todas
+            </button>
+          </div>
+
           {/* SELETOR DE ESTILO DO MAPA */}
           <div className="flex items-center bg-slate-100 p-1.5 rounded-2xl border-2 border-slate-300 text-xs gap-1">
             <button

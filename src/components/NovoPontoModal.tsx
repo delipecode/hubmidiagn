@@ -68,6 +68,7 @@ export function NovoPontoModal({
   const [codigoIdentificador, setCodigoIdentificador] = useState("");
   const [nomeLocal, setNomeLocal] = useState("");
   const [tipoFormato, setTipoFormato] = useState("Outdoor Lona 9x3m");
+  const [praca, setPraca] = useState("Feira de Santana");
   const [bairro, setBairro] = useState("Santa Mônica");
   const [endereco, setEndereco] = useState("");
   const [latitude, setLatitude] = useState("-12.2512");
@@ -86,7 +87,7 @@ export function NovoPontoModal({
   const [numPI, setNumPI] = useState("");
   const [valorNegociado, setValorNegociado] = useState("");
 
-  // Sugestões rápidas de coordenadas para bairros de Feira de Santana
+  // Sugestões rápidas de coordenadas para bairros de Feira de Santana, Ipirá e Irecê
   const bairrosCoordenadas: Record<string, { lat: string; lng: string }> = {
     "Santa Mônica": { lat: "-12.2512", lng: "-38.9554" },
     Centro: { lat: "-12.2580", lng: "-38.9710" },
@@ -95,6 +96,27 @@ export function NovoPontoModal({
     Sim: { lat: "-12.2685", lng: "-38.9320" },
     Kalilândia: { lat: "-12.2550", lng: "-38.9680" },
     Muchila: { lat: "-12.2710", lng: "-38.9750" },
+    "Ipirá - Centro": { lat: "-12.1585", lng: "-39.7385" },
+    "Ipirá - Entrada BA-052": { lat: "-12.1520", lng: "-39.7280" },
+    "Irecê - Centro": { lat: "-11.3045", lng: "-41.8570" },
+    "Irecê - Trevo BA-052": { lat: "-11.3120", lng: "-41.8480" },
+  };
+
+  const handlePracaChange = (novaPraca: string) => {
+    setPraca(novaPraca);
+    if (novaPraca === "Ipirá") {
+      setBairro("Centro");
+      setLatitude("-12.1585");
+      setLongitude("-39.7380");
+    } else if (novaPraca === "Irecê") {
+      setBairro("Centro");
+      setLatitude("-11.3045");
+      setLongitude("-41.8570");
+    } else if (novaPraca === "Feira de Santana") {
+      setBairro("Santa Mônica");
+      setLatitude("-12.2512");
+      setLongitude("-38.9554");
+    }
   };
 
   const handleBairroChange = (novoBairro: string) => {
@@ -115,7 +137,7 @@ export function NovoPontoModal({
         codigoIdentificador: codigoIdentificador || `PONTO-${Math.floor(Math.random() * 900 + 100)}`,
         nomeLocal,
         tipoFormato,
-        praca: "Feira de Santana",
+        praca,
         bairro,
         endereco,
         latitude: parseFloat(latitude),
@@ -263,35 +285,45 @@ export function NovoPontoModal({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                   <div>
                     <label className="block text-slate-700 font-semibold mb-1">
-                      Bairro (Feira de Santana):
+                      Praça / Cidade:
                     </label>
                     <select
-                      value={bairro}
-                      onChange={(e) => handleBairroChange(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
+                      value={praca}
+                      onChange={(e) => handlePracaChange(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-blue-500 focus:bg-white font-bold"
                     >
-                      <option value="Santa Mônica">Santa Mônica</option>
-                      <option value="Centro">Centro</option>
-                      <option value="Capuchinhos">Capuchinhos</option>
-                      <option value="Fraga Maia">Fraga Maia</option>
-                      <option value="Sim">Sim (Noide Cerqueira)</option>
-                      <option value="Kalilândia">Kalilândia</option>
-                      <option value="Muchila">Muchila</option>
+                      <option value="Feira de Santana">Feira de Santana</option>
+                      <option value="Ipirá">Ipirá</option>
+                      <option value="Irecê">Irecê</option>
                     </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-700 font-semibold mb-1">
+                      Bairro / Região:
+                    </label>
+                    <input
+                      type="text"
+                      value={bairro}
+                      onChange={(e) => setBairro(e.target.value)}
+                      placeholder="Ex: Centro, Entrada da Cidade..."
+                      required
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
+                    />
                   </div>
 
                   <div className="sm:col-span-2">
                     <label className="block text-slate-700 font-semibold mb-1">
-                      Endereço Completo:
+                      Endereço Completo / Referência:
                     </label>
                     <input
                       type="text"
                       value={endereco}
                       onChange={(e) => setEndereco(e.target.value)}
-                      placeholder="Ex: Av. Getúlio Vargas, 2400"
+                      placeholder="Ex: BA-052 Trevo de Acesso ou Av. Principal"
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
                     />
                   </div>

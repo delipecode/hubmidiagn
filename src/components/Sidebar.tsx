@@ -166,18 +166,24 @@ export function Sidebar() {
           </Link>
 
           {/* STATUS OPERACIONAL */}
-          <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
+          <Link
+            href="/pontos"
+            className="p-3 rounded-2xl bg-slate-50 hover:bg-blue-50/60 border border-slate-200 hover:border-blue-300 flex items-center justify-between transition-all group"
+            title="Ver mapa das praças"
+          >
+            <div className="flex items-center gap-2">
               <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600"></span>
               </span>
-              <span className="text-xs font-bold text-slate-800">Feira de Santana</span>
+              <span className="text-xs font-black text-slate-800 group-hover:text-blue-700 transition-colors">
+                Feira • Ipirá • Irecê
+              </span>
             </div>
-            <span className="text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-md">
-              2026.2
+            <span className="text-[10px] font-black text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md">
+              3 Praças
             </span>
-          </div>
+          </Link>
 
           {/* LINKS DE NAVEGAÇÃO */}
           <nav className="space-y-1.5">

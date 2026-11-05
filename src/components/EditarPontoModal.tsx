@@ -84,6 +84,7 @@ export function EditarPontoModal({
   const [tipoFormato, setTipoFormato] = useState(
     ponto?.tipoFormato || "Outdoor Lona 9x3m"
   );
+  const [praca, setPraca] = useState(ponto?.praca || "Feira de Santana");
   const [bairro, setBairro] = useState(ponto?.bairro || "Centro");
   const [endereco, setEndereco] = useState(ponto?.endereco || "");
   const [latitude, setLatitude] = useState(
@@ -104,6 +105,7 @@ export function EditarPontoModal({
       setCodigoIdentificador(ponto.codigoIdentificador || "");
       setNomeLocal(ponto.nomeLocal || "");
       setTipoFormato(ponto.tipoFormato || "Outdoor Lona 9x3m");
+      setPraca(ponto.praca || "Feira de Santana");
       setBairro(ponto.bairro || "Centro");
       setEndereco(ponto.endereco || "");
       setLatitude(ponto.latitude ? String(ponto.latitude) : "-12.2575");
@@ -149,7 +151,7 @@ export function EditarPontoModal({
         codigoIdentificador,
         nomeLocal,
         tipoFormato,
-        praca: ponto.praca || "Feira de Santana",
+        praca: praca || ponto.praca || "Feira de Santana",
         bairro,
         endereco,
         latitude: parseFloat(latitude) || -12.2575,
@@ -394,24 +396,33 @@ export function EditarPontoModal({
               </div>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
               <div>
                 <label className="block text-slate-700 font-bold mb-1">
-                  Bairro:
+                  Praça / Cidade:
+                </label>
+                <select
+                  value={praca}
+                  onChange={(e) => setPraca(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-blue-600 focus:bg-white font-bold"
+                >
+                  <option value="Feira de Santana">Feira de Santana</option>
+                  <option value="Ipirá">Ipirá</option>
+                  <option value="Irecê">Irecê</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-bold mb-1">
+                  Bairro / Região:
                 </label>
                 <input
                   type="text"
-                  list="lista-bairros-fsa"
                   value={bairro}
-                  onChange={(e) => handleBairroChange(e.target.value)}
+                  onChange={(e) => setBairro(e.target.value)}
                   required
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-blue-600 focus:bg-white"
                 />
-                <datalist id="lista-bairros-fsa">
-                  {Object.keys(bairrosCoordenadas).map((b) => (
-                    <option key={b} value={b} />
-                  ))}
-                </datalist>
               </div>
 
               <div className="sm:col-span-2">

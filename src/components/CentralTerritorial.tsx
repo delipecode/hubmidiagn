@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { BrandBadge, StatusBadge, CountdownBadge, MediaCategoryBadge } from "@/components/BrandBadge";
 import { formatarData } from "@/lib/utils";
@@ -41,6 +41,7 @@ export function CentralTerritorial({
 }: CentralTerritorialProps) {
   const router = useRouter();
   const [modoVisualizacao, setModoVisualizacao] = useState<"mapa" | "inventario" | "checking">("mapa");
+  const [pracaSelecionada, setPracaSelecionada] = useState<string>("TODAS");
   const [filtroMarca, setFiltroMarca] = useState("TODAS");
   const [filtroStatus, setFiltroStatus] = useState("TODOS");
   const [filtroTipoMidia, setFiltroTipoMidia] = useState("TODOS");
@@ -53,6 +54,56 @@ export function CentralTerritorial({
   const mapInstanceRef = useRef<any>(null);
   const currentTileLayerRef = useRef<any>(null);
   const markersRef = useRef<Record<string, any>>({});
+
+  const pracasCoordenadas: Record<string, { lat: number; lng: number; zoom: number; nome: string; tag: string; desc: string }> = {
+    "Feira de Santana": {
+      lat: -12.2575,
+      lng: -38.9667,
+      zoom: 13,
+      nome: "Feira de Santana",
+      tag: "Hub Sede",
+      desc: "Sede Corporativa • UNEF, UNIFAN, Colégio Nobre e Maple Bear",
+    },
+    "Ipirá": {
+      lat: -12.1585,
+      lng: -39.7380,
+      zoom: 14,
+      nome: "Ipirá",
+      tag: "UNIFAN Polo",
+      desc: "Pólo Universitário UNIFAN & Cobertura BA-052 Estrada do Feijão",
+    },
+    "Irecê": {
+      lat: -11.3050,
+      lng: -41.8550,
+      zoom: 14,
+      nome: "Irecê",
+      tag: "Polo Regional Chapada",
+      desc: "Pólo Macrorregional Chapada Diamantina & Captação Medicina UNEF / UNIFAN",
+    },
+    "TODAS": {
+      lat: -11.85,
+      lng: -40.35,
+      zoom: 8,
+      nome: "Todas as Praças",
+      tag: "Circuito Bahia",
+      desc: "Visão Integrada de Toda a Rede: Feira de Santana, Ipirá, Irecê e Rodovias",
+    },
+  };
+
+  const pontosFSA = useMemo(
+    () => pontos.filter((p) => !p.praca || p.praca === "Feira de Santana" || p.praca.includes("Feira")),
+    [pontos]
+  );
+  const pontosIpira = useMemo(() => pontos.filter((p) => p.praca === "Ipirá"), [pontos]);
+  const pontosIrece = useMemo(() => pontos.filter((p) => p.praca === "Irecê"), [pontos]);
+
+  const mudarPraca = (novaPraca: string) => {
+    setPracaSelecionada(novaPraca);
+    if (mapInstanceRef.current && pracasCoordenadas[novaPraca]) {
+      const { lat, lng, zoom } = pracasCoordenadas[novaPraca];
+      mapInstanceRef.current.flyTo([lat, lng], zoom, { duration: 1.2 });
+    }
+  };
 
   const camadas = {
     claro: {
@@ -78,6 +129,14 @@ export function CentralTerritorial({
   const pontosFiltrados = pontos.filter((p) => {
     const midiaAtiva = p.midias && p.midias.length > 0 ? p.midias[0] : null;
     const marcaPonto = midiaAtiva ? midiaAtiva.marcaId : null;
+
+    // Filtro por Praça
+    const matchPraca =
+      pracaSelecionada === "TODAS" ||
+      p.praca === pracaSelecionada ||
+      (pracaSelecionada === "Feira de Santana" && (!p.praca || p.praca === "Feira de Santana" || p.praca.includes("Feira")));
+
+    if (!matchPraca) return false;
 
     const matchMarca =
       filtroMarca === "TODAS" ||
@@ -108,7 +167,7 @@ export function CentralTerritorial({
       }
     }
 
-    const textoBusca = `${p.nomeLocal} ${p.bairro} ${p.endereco} ${p.codigoIdentificador} ${p.fornecedor?.nome || ""} ${midiaAtiva?.campanha?.nome || ""}`.toLowerCase();
+    const textoBusca = `${p.nomeLocal} ${p.praca || ""} ${p.bairro} ${p.endereco} ${p.codigoIdentificador} ${p.fornecedor?.nome || ""} ${midiaAtiva?.campanha?.nome || ""}`.toLowerCase();
     const matchBusca = !busca || textoBusca.includes(busca.toLowerCase());
 
     return matchMarca && matchStatus && matchTipo && matchBusca;
@@ -117,7 +176,15 @@ export function CentralTerritorial({
   const checkingsFiltrados = checkings.filter((chk) => {
     const marcaId = chk.midiaCampanha?.marcaId;
     const matchMarca = filtroMarca === "TODAS" || marcaId === filtroMarca;
-    const textoBusca = `${chk.pontoFisico?.nomeLocal} ${chk.pontoFisico?.bairro} ${chk.midiaCampanha?.campanha?.nome || ""}`.toLowerCase();
+
+    const matchPraca =
+      pracaSelecionada === "TODAS" ||
+      chk.pontoFisico?.praca === pracaSelecionada ||
+      (pracaSelecionada === "Feira de Santana" && (!chk.pontoFisico?.praca || chk.pontoFisico?.praca === "Feira de Santana" || chk.pontoFisico?.praca?.includes("Feira")));
+
+    if (!matchPraca) return false;
+
+    const textoBusca = `${chk.pontoFisico?.nomeLocal} ${chk.pontoFisico?.praca || ""} ${chk.pontoFisico?.bairro} ${chk.midiaCampanha?.campanha?.nome || ""}`.toLowerCase();
     const matchBusca = !busca || textoBusca.includes(busca.toLowerCase());
     return matchMarca && matchBusca;
   });
@@ -135,9 +202,10 @@ export function CentralTerritorial({
         mapInstanceRef.current = null;
       }
 
+      const targetPraca = pracasCoordenadas[pracaSelecionada] || pracasCoordenadas["Feira de Santana"];
       const map = L.map(mapContainerRef.current, {
-        center: [-12.2575, -38.9667],
-        zoom: 13,
+        center: [targetPraca.lat, targetPraca.lng],
+        zoom: targetPraca.zoom,
         scrollWheelZoom: true,
         zoomControl: true,
       });
@@ -285,7 +353,7 @@ export function CentralTerritorial({
       const popupContent = `
         <div style="width: 280px; font-family: var(--font-saira, sans-serif); color: #0F172A; line-height: 1.35; padding: 2px;">
           ${fotoHtml}
-          <div style="font-size: 10px; color: #1D4ED8; text-transform: uppercase; font-weight: 800;">${ponto.codigoIdentificador || 'PONTO'} • ${ponto.bairro}</div>
+          <div style="font-size: 10px; color: #1D4ED8; text-transform: uppercase; font-weight: 800;">${ponto.codigoIdentificador || 'PONTO'} • ${ponto.praca || 'Feira de Santana'} • ${ponto.bairro}</div>
           <div style="font-size: 14px; font-weight: 800; color: #0F172A; margin-top: 2px;">${ponto.nomeLocal}</div>
           <div style="font-size: 11px; color: #475569; font-weight: 700; margin-top: 2px;">${ponto.tipoFormato}</div>
           <div style="font-size: 11px; color: #334155; margin-top: 2px;">📍 ${ponto.endereco}</div>
@@ -370,6 +438,112 @@ export function CentralTerritorial({
           </div>
 
           <NovoPontoModal fornecedores={fornecedores} campanhas={campanhas} />
+        </div>
+      </div>
+
+      {/* 🏙️ SELETOR DE PRAÇAS & MAPAS REGIONAIS (FEIRA DE SANTANA, IPIRÁ, IRECÊ) */}
+      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-blue-950 text-white rounded-3xl p-5 shadow-lg border border-slate-700 space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[11px] font-black uppercase tracking-wider text-blue-200">
+                Praça Selecionada no Mapa
+              </span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-white border border-white/20">
+                {pracasCoordenadas[pracaSelecionada]?.tag || "Bahia"}
+              </span>
+            </div>
+            <h2 className="font-display text-xl md:text-2xl font-black text-white tracking-tight">
+              {pracasCoordenadas[pracaSelecionada]?.nome || "Rede de Mídias Grupo Nobre"}
+            </h2>
+            <p className="text-xs text-slate-300 font-medium max-w-2xl">
+              {pracasCoordenadas[pracaSelecionada]?.desc}
+            </p>
+          </div>
+
+          {/* BOTÕES DE NAVEGAÇÃO ENTRE AS PRAÇAS */}
+          <div className="flex flex-wrap items-center gap-2 bg-black/40 p-1.5 rounded-2xl border border-white/10 shrink-0">
+            <button
+              onClick={() => mudarPraca("Feira de Santana")}
+              className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer ${
+                pracaSelecionada === "Feira de Santana"
+                  ? "bg-blue-600 text-white shadow-md shadow-blue-500/30 scale-[1.02]"
+                  : "text-slate-300 hover:text-white hover:bg-white/10"
+              }`}
+            >
+              <span>📍 Feira de Santana</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold ${
+                  pracaSelecionada === "Feira de Santana"
+                    ? "bg-white/20 text-white"
+                    : "bg-white/10 text-slate-300"
+                }`}
+              >
+                {pontosFSA.length}
+              </span>
+            </button>
+
+            <button
+              onClick={() => mudarPraca("Ipirá")}
+              className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer ${
+                pracaSelecionada === "Ipirá"
+                  ? "bg-amber-500 text-slate-950 shadow-md shadow-amber-500/30 scale-[1.02]"
+                  : "text-slate-300 hover:text-white hover:bg-white/10"
+              }`}
+            >
+              <span>📍 Ipirá</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded-md font-black ${
+                  pracaSelecionada === "Ipirá"
+                    ? "bg-black/20 text-black"
+                    : "bg-white/10 text-amber-300"
+                }`}
+              >
+                {pontosIpira.length}
+              </span>
+            </button>
+
+            <button
+              onClick={() => mudarPraca("Irecê")}
+              className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer ${
+                pracaSelecionada === "Irecê"
+                  ? "bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/30 scale-[1.02]"
+                  : "text-slate-300 hover:text-white hover:bg-white/10"
+              }`}
+            >
+              <span>📍 Irecê</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded-md font-black ${
+                  pracaSelecionada === "Irecê"
+                    ? "bg-black/20 text-black"
+                    : "bg-white/10 text-emerald-300"
+                }`}
+              >
+                {pontosIrece.length}
+              </span>
+            </button>
+
+            <button
+              onClick={() => mudarPraca("TODAS")}
+              className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer ${
+                pracaSelecionada === "TODAS"
+                  ? "bg-white text-slate-950 shadow-md scale-[1.02]"
+                  : "text-slate-300 hover:text-white hover:bg-white/10"
+              }`}
+            >
+              <span>🌐 Todas as Praças</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold ${
+                  pracaSelecionada === "TODAS"
+                    ? "bg-slate-200 text-slate-900"
+                    : "bg-white/10 text-slate-300"
+                }`}
+              >
+                {pontos.length}
+              </span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -563,9 +737,14 @@ export function CentralTerritorial({
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className={`text-xs font-black ${isSelected ? "text-blue-900" : "text-slate-900"}`}>
-                      {ponto.codigoIdentificador || "PONTO"}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className={`text-xs font-black ${isSelected ? "text-blue-900" : "text-slate-900"}`}>
+                        {ponto.codigoIdentificador || "PONTO"}
+                      </span>
+                      <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-blue-100 text-blue-900 border border-blue-200">
+                        {ponto.praca || "Feira de Santana"}
+                      </span>
+                    </div>
                     <StatusBadge status={ponto.statusPonto} />
                   </div>
 
@@ -670,7 +849,12 @@ export function CentralTerritorial({
 
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs text-slate-600 font-bold">
-                      <span className="text-blue-700 font-extrabold">{ponto.codigoIdentificador || "PONTO"}</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-blue-700 font-extrabold">{ponto.codigoIdentificador || "PONTO"}</span>
+                        <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-blue-100 text-blue-900 border border-blue-200">
+                          {ponto.praca || "Feira de Santana"}
+                        </span>
+                      </div>
                       <span>{ponto.bairro}</span>
                     </div>
 
