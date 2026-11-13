@@ -414,6 +414,73 @@ export async function adicionarMidiaCampanha(formData: {
   return { success: true, id };
 }
 
+export async function adicionarMidiasCampanhaBatch(
+  items: Array<{
+    campanhaId: string;
+    marcaId: string;
+    fornecedorId: string;
+    pontoFisicoId?: string | null;
+    categoriaMidia: string;
+    subtipoMidia: string;
+    formatoPeca: string;
+    biSemana?: string;
+    dataContrato?: string;
+    dataInicio: string;
+    dataFim: string;
+    statusVeiculacao?: string;
+    tipoAcaoFinal?: string;
+    valorNegociado?: number;
+    numPI?: string;
+    observacoes?: string;
+  }>
+) {
+  if (items.length === 0) return { success: true, count: 0, ids: [] };
+
+  const ids: string[] = [];
+  const timestampBase = Date.now();
+
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    const id = `MID-${timestampBase}-${i + 1}`;
+    ids.push(id);
+
+    await db.insert(midiasCampanha).values({
+      id,
+      campanhaId: item.campanhaId,
+      marcaId: item.marcaId,
+      fornecedorId: item.fornecedorId,
+      pontoFisicoId: item.pontoFisicoId || null,
+      categoriaMidia: item.categoriaMidia || "OFFLINE",
+      subtipoMidia: item.subtipoMidia || "OUTDOOR_BISEMANA",
+      formatoPeca: item.formatoPeca,
+      tipoRegraPrazo: item.biSemana ? "BISEMANA_FIXA" : "MANUAL_DATAS",
+      biSemana: item.biSemana || null,
+      dataContrato: item.dataContrato || item.dataInicio,
+      dataInicio: item.dataInicio,
+      dataFim: item.dataFim,
+      statusVeiculacao: item.statusVeiculacao || "No Ar / Ativo",
+      tipoAcaoFinal: item.tipoAcaoFinal || "Renovação Contrato",
+      valorNegociado: item.valorNegociado,
+      numPI: item.numPI,
+      observacoes: item.observacoes,
+    });
+
+    if (item.pontoFisicoId) {
+      await db
+        .update(pontosFisicos)
+        .set({ statusPonto: "Comprado / Ativo" })
+        .where(eq(pontosFisicos.id, item.pontoFisicoId));
+    }
+  }
+
+  revalidatePath("/campanhas");
+  revalidatePath("/pontos");
+  revalidatePath("/mapa");
+  revalidatePath("/");
+
+  return { success: true, count: ids.length, ids };
+}
+
 export async function editarMidiaCampanha(
   id: string,
   formData: {
