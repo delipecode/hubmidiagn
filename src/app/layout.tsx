@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
-import { Saira } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { AppLayoutWrapper } from "@/components/AppLayoutWrapper";
 
-const saira = Saira({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
-  variable: "--font-saira",
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-display",
   display: "swap",
 });
 
@@ -21,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={`${saira.variable} font-sans`}>
+    <html lang="pt-BR" className={`${inter.variable} ${plusJakartaSans.variable} font-sans`}>
       <body className="min-h-screen bg-[#F4F6FB] text-slate-900 font-sans antialiased selection:bg-blue-600 selection:text-white overflow-x-hidden">
         <AppLayoutWrapper>{children}</AppLayoutWrapper>
       </body>

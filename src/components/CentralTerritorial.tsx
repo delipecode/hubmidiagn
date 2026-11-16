@@ -341,8 +341,8 @@ export function CentralTerritorial({
       const campanhaHtml = midiaAtiva
         ? `<div style="background: #F8FAFC; border: 1px solid #CBD5E1; padding: 10px; border-radius: 12px; margin: 8px 0;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-              <span style="font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 6px; font-family: var(--font-saira, sans-serif); ${marcaBadgeStyle}">${marcaLabel}</span>
-              <span style="font-size: 10px; color: #1e3a8a; font-family: var(--font-saira, sans-serif); font-weight: 800; background: #DBEAFE; padding: 2px 6px; border-radius: 4px;">${midiaAtiva.biSemana || "Ativa"}</span>
+              <span style="font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 6px; font-family: var(--font-sans, sans-serif); ${marcaBadgeStyle}">${marcaLabel}</span>
+              <span style="font-size: 10px; color: #1e3a8a; font-family: var(--font-sans, sans-serif); font-weight: 800; background: #DBEAFE; padding: 2px 6px; border-radius: 4px;">${midiaAtiva.biSemana || "Ativa"}</span>
             </div>
             <div style="font-size: 13px; font-weight: 800; color: #0F172A;">${midiaAtiva.campanha?.nome || "Campanha em Exibição"}</div>
             <div style="font-size: 11px; color: #475569; margin-top: 4px; font-weight: 600;">Vigência: ${formatarData(midiaAtiva.dataInicio)} a ${formatarData(midiaAtiva.dataFim)}</div>
@@ -359,7 +359,7 @@ export function CentralTerritorial({
         : "";
 
       const popupContent = `
-        <div style="width: 280px; font-family: var(--font-saira, sans-serif); color: #0F172A; line-height: 1.35; padding: 2px;">
+        <div style="width: 280px; font-family: var(--font-sans, sans-serif); color: #0F172A; line-height: 1.35; padding: 2px;">
           ${fotoHtml}
           <div style="font-size: 10px; color: #1D4ED8; text-transform: uppercase; font-weight: 800;">${ponto.codigoIdentificador || 'PONTO'} • ${ponto.praca || 'Feira de Santana'} • ${ponto.bairro}</div>
           <div style="font-size: 14px; font-weight: 800; color: #0F172A; margin-top: 2px;">${ponto.nomeLocal}</div>
