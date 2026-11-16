@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { editarMidiaCampanha, excluirMidiaCampanha } from "@/lib/actions";
+import { SeletorBiSemanaCalendario } from "@/components/SeletorBiSemanaCalendario";
 import {
   Edit3,
   X,
@@ -279,6 +280,19 @@ export function EditarMidiaModal({
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 outline-none focus:border-blue-500 focus:bg-white font-bold"
                 />
               </div>
+
+              {/* PROGRAMAÇÃO DE CALENDÁRIO COM BI-SEMANAS (ESCOPO AUTOMÁTICO DE DATAS) */}
+              <SeletorBiSemanaCalendario
+                biSemanaSelecionada={biSemana}
+                dataInicio={dataInicio}
+                dataFim={dataFim}
+                subtipoMidia={subtipoMidia}
+                onSelecionarBiSemana={(bs) => {
+                  setBiSemana(bs.label);
+                  setDataInicio(bs.dataInicio);
+                  setDataFim(bs.dataFim);
+                }}
+              />
 
               {/* BI-SEMANA & DATAS */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

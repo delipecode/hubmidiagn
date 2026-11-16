@@ -25,6 +25,8 @@ import {
   Info,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SeletorBiSemanaCalendario } from "@/components/SeletorBiSemanaCalendario";
+import { getBiSemanaAtual } from "@/lib/bissemanas";
 
 interface PontoFisicoItem {
   id: string;
@@ -167,16 +169,12 @@ export function VincularMidiaModal({
   );
   const [subtipoMidia, setSubtipoMidia] = useState("OUTDOOR_BISEMANA");
   const [formatoPeca, setFormatoPeca] = useState("Lona 9,00 x 3,00m");
-  const [biSemana, setBiSemana] = useState("BS 21 (06/10 a 19/10)");
+  const [biSemana, setBiSemana] = useState(() => getBiSemanaAtual().label);
   const [dataContrato, setDataContrato] = useState(
     new Date().toISOString().split("T")[0]
   );
-  const [dataInicio, setDataInicio] = useState(
-    new Date().toISOString().split("T")[0]
-  );
-  const [dataFim, setDataFim] = useState(
-    new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]
-  );
+  const [dataInicio, setDataInicio] = useState(() => getBiSemanaAtual().dataInicio);
+  const [dataFim, setDataFim] = useState(() => getBiSemanaAtual().dataFim);
   const [tipoAcaoFinal, setTipoAcaoFinal] = useState("Troca de Lona/Adesivo");
   const [valorNegociado, setValorNegociado] = useState("");
   const [numPI, setNumPI] = useState("");
@@ -1019,6 +1017,19 @@ export function VincularMidiaModal({
                   </div>
                 </div>
               )}
+
+              {/* PROGRAMAÇÃO DE CALENDÁRIO COM BI-SEMANAS (ESCOPO AUTOMÁTICO DE DATAS) */}
+              <SeletorBiSemanaCalendario
+                biSemanaSelecionada={biSemana}
+                dataInicio={dataInicio}
+                dataFim={dataFim}
+                subtipoMidia={subtipoMidia}
+                onSelecionarBiSemana={(bs) => {
+                  setBiSemana(bs.label);
+                  setDataInicio(bs.dataInicio);
+                  setDataFim(bs.dataFim);
+                }}
+              />
 
               {/* DADOS DE EXECUÇÃO: ESPECIFICAÇÃO, BI-SEMANA E VIGÊNCIA */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

@@ -17,12 +17,16 @@ import {
   LogOut,
   ShieldCheck,
 } from "lucide-react";
+import { getBiSemanaAtual, getProximaBiSemana } from "@/lib/bissemanas";
 
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggingOut, startLogout] = useTransition();
+
+  const bsAtual = getBiSemanaAtual();
+  const bsProx = getProximaBiSemana();
 
   // Não exibe a sidebar na página de login
   if (pathname === "/login") {
@@ -242,11 +246,11 @@ export function Sidebar() {
               </span>
             </div>
             <div className="text-base font-black text-white tracking-tight">
-              BS 21 (06/10 a 19/10)
+              {bsAtual.label}
             </div>
             <div className="text-[11px] text-slate-200 font-bold flex items-center justify-between pt-2 border-t border-slate-800">
-              <span className="text-slate-300">Próxima: BS 22</span>
-              <span className="font-black text-sky-300 bg-sky-950/80 px-2 py-0.5 rounded border border-sky-700">em 12 dias</span>
+              <span className="text-slate-300">Próxima: BS {bsProx.numero}</span>
+              <span className="font-black text-sky-300 bg-sky-950/80 px-2 py-0.5 rounded border border-sky-700">{bsProx.periodo}</span>
             </div>
           </div>
 

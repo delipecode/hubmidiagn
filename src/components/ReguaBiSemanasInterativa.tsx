@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { getBiSemanasAno, getBiSemanaAtual } from "@/lib/bissemanas";
 import { BrandBadge, StatusBadge, CountdownBadge, MediaCategoryBadge } from "@/components/BrandBadge";
 import { formatarData } from "@/lib/utils";
 import Link from "next/link";
@@ -26,57 +27,27 @@ interface ReguaBiSemanasProps {
 }
 
 export function ReguaBiSemanasInterativa({ midias, pontos }: ReguaBiSemanasProps) {
-  const [bsSelecionada, setBsSelecionada] = useState("21");
+  const bsAtual = useMemo(() => getBiSemanaAtual(), []);
+  const [bsSelecionada, setBsSelecionada] = useState(() => bsAtual.numero);
 
-  const biSemanas2026 = [
-    {
-      numero: "20",
-      periodo: "22/09 a 05/10",
-      status: "Encerrada",
-      ativa: false,
-      prazoLona: "Concluído",
-      colagem: "21/09 (Dom)",
-      descolagem: "05/10 (Dom)",
-    },
-    {
-      numero: "21",
-      periodo: "06/10 a 19/10",
-      status: "No Ar Agora",
-      ativa: true,
-      prazoLona: "Em exibição na rua",
-      colagem: "05/10 (Dom)",
-      descolagem: "19/10 (Dom)",
-    },
-    {
-      numero: "22",
-      periodo: "20/10 a 02/11",
-      status: "Envio de Lonas",
-      ativa: false,
-      prazoLona: "Entregar lonas até 16/10 (Qui)",
-      colagem: "19/10 (Dom)",
-      descolagem: "02/11 (Dom)",
-    },
-    {
-      numero: "23",
-      periodo: "03/11 a 16/11",
-      status: "Programada",
-      ativa: false,
-      prazoLona: "Aprovação de arte até 28/10",
-      colagem: "02/11 (Dom)",
-      descolagem: "16/11 (Dom)",
-    },
-    {
-      numero: "24",
-      periodo: "17/11 a 30/11",
-      status: "Programada",
-      ativa: false,
-      prazoLona: "Aprovação de arte até 11/11",
-      colagem: "16/11 (Dom)",
-      descolagem: "30/11 (Dom)",
-    },
-  ];
+  // Gera todas as bi-semanas de 2026 e pega as 5 bi-semanas ao redor da atual
+  const todasBiSemanas = useMemo(() => getBiSemanasAno(2026), []);
+  const biSemanas2026 = useMemo(() => {
+    const curIdx = todasBiSemanas.findIndex((b) => b.numero === bsAtual.numero);
+    const start = Math.max(0, curIdx - 2);
+    const end = Math.min(todasBiSemanas.length, start + 5);
+    return todasBiSemanas.slice(start, end).map((b) => ({
+      numero: b.numero,
+      periodo: b.periodo,
+      status: b.status === "ATUAL" ? "No Ar Agora" : b.status === "PROXIMA" ? "Envio de Lonas" : b.status === "ENCERRADA" ? "Encerrada" : "Programada",
+      ativa: b.status === "ATUAL",
+      prazoLona: b.prazoLona,
+      colagem: b.colagem,
+      descolagem: b.descolagem,
+    }));
+  }, [todasBiSemanas, bsAtual]);
 
-  const infoBs = biSemanas2026.find((b) => b.numero === bsSelecionada) || biSemanas2026[1];
+  const infoBs = biSemanas2026.find((b) => b.numero === bsSelecionada) || biSemanas2026[0];
 
   const midiasDaBS = midias.filter((m) => {
     if (m.categoriaMidia !== "OFFLINE") return false;
@@ -110,7 +81,7 @@ export function ReguaBiSemanasInterativa({ midias, pontos }: ReguaBiSemanasProps
 
         <div className="flex items-center gap-2 self-start sm:self-auto">
           <span className="text-xs text-slate-950 font-bold px-3 py-1 rounded-xl bg-amber-400 shadow-sm">
-            BS 21 Ativa no Momento
+            BS {bsAtual.numero} Ativa no Momento
           </span>
         </div>
       </div>
