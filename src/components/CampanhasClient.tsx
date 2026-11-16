@@ -510,11 +510,18 @@ export function CampanhasClient({
                                 <Calendar className="w-3 h-3 text-blue-600" />
                                 {formatarData(midia.dataInicio)} a {formatarData(midia.dataFim)}
                               </span>
-                              {midia.biSemana && !temFoto && (
-                                <span className="font-bold text-slate-700 bg-slate-200/60 px-1.5 py-0.5 rounded">
-                                  {midia.biSemana}
-                                </span>
-                              )}
+                              <div className="flex items-center gap-1.5">
+                                {midia.valorNegociado !== null && midia.valorNegociado !== undefined && (
+                                  <span className="font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-[10px]">
+                                    R$ {midia.valorNegociado.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                                  </span>
+                                )}
+                                {midia.biSemana && !temFoto && (
+                                  <span className="font-bold text-slate-700 bg-slate-200/60 px-1.5 py-0.5 rounded text-[10px]">
+                                    {midia.biSemana}
+                                  </span>
+                                )}
+                              </div>
                             </div>
 
                             <div className="flex items-center justify-between gap-2">
